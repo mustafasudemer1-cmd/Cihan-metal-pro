@@ -1135,7 +1135,31 @@ function v7DeleteCS(id){if(!confirm("Bu kayıt silinsin mi?"))return;db.v7.cs=db
   var oldSave=save;
   save=function(){oldSave();if(driveToken){clearTimeout(driveTimer);driveTimer=setTimeout(driveUpload,12000);}};
   // Explain session limitation accurately.
-  status('Drive henüz bağlanmadı. Bağlayınca bu oturumda kayıt sonrası yedekler yüklenir; yeni oturumda yeniden bağlanman gerekir.');
+  function driveApi(path,opts){opts=opts||{};opts.headers=Object.assign({Authorization:'Bearer '+driveToken},opts.headers||{});return fetch('https://www.googleapis.com/drive/v3/'+path,opts).then(function(r){if(!r.ok)return r.text().then(function(t){throw new Error(t||('HTTP '+r.status));});return r.json();});}
+  function driveBackupList(){
+    if(!driveToken){status('Önce Google Drive’ı bağla.');return;}
+    status('Drive yedekleri aranıyor…');
+    var q=encodeURIComponent("name contains 'Cihan-Metal-Pro-' and trashed = false");
+    driveApi('files?q='+q+'&orderBy=createdTime%20desc&pageSize=30&fields=files(id,name,createdTime,size)')
+      .then(function(data){var wrap=document.getElementById('cmDriveBackups');if(!wrap)return;wrap.innerHTML='';var files=data.files||[];
+        if(!files.length){wrap.textContent='Bu Google hesabında henüz Cihan Metal Pro yedeği bulunamadı.';status('Drive’da yedek bulunamadı.');return;}var lastInfo=document.getElementById('cmDriveLastInfo');if(lastInfo&&files[0].createdTime)lastInfo.textContent='Google Drive’daki en son yedek: '+new Date(files[0].createdTime).toLocaleString('tr-TR');
+        files.forEach(function(f){var row=document.createElement('div');row.className='card';row.style.margin='8px 0';var title=document.createElement('b');title.textContent=f.name;var meta=document.createElement('p');meta.className='hint';meta.textContent=(f.createdTime?new Date(f.createdTime).toLocaleString('tr-TR'):'Tarih yok')+(f.size?' · '+Math.max(1,Math.round(Number(f.size)/1024))+' KB':'');var btn=document.createElement('button');btn.className='b2 full';btn.textContent='Bu yedeği geri yükle';btn.onclick=function(){driveRestoreFile(f.id,f.name);};row.appendChild(title);row.appendChild(meta);row.appendChild(btn);wrap.appendChild(row);});status(files.length+' Drive yedeği listelendi. En yeni yedek en üstte.');
+      }).catch(function(e){status('Drive yedekleri listelenemedi: '+(e.message||e));});
+  }
+  function driveRestoreFile(id,name){
+    if(!driveToken)return;status('Seçilen yedek indiriliyor…');
+    fetch('https://www.googleapis.com/drive/v3/files/'+encodeURIComponent(id)+'?alt=media',{headers:{Authorization:'Bearer '+driveToken}})
+      .then(function(r){if(!r.ok)return r.text().then(function(t){throw new Error(t||('HTTP '+r.status));});return r.blob();})
+      .then(function(blob){if(blob.size<20)throw new Error('Yedek dosyası boş görünüyor.');var file=new File([blob],name||'cihan-metal-drive-yedek.json',{type:'application/json'});if(typeof window.restore!=='function')throw new Error('Geri yükleme aracı bulunamadı.');status('Yedek indirildi; güvenli geri yükleme kontrolü açılıyor…');window.restore({files:[file],value:''});})
+      .catch(function(e){status('Yedek indirilemedi: '+(e.message||e));});
+  }
+  window.cmDriveManualBackup=function(){if(!driveToken){window.connectCihanDrive();return;}lastDriveUpload=0;driveUpload();};
+  window.cmDriveListBackups=driveBackupList;
+  function addDriveBackupPanel(){var settings=document.getElementById('p-s');if(!settings||document.getElementById('cmDriveBackupPanel'))return;var card=document.createElement('div');card.className='card';card.id='cmDriveBackupPanel';card.style.marginTop='12px';card.innerHTML='<h3>Google Drive yedek geçmişi</h3><p class="hint">Son yedek tarihini kontrol et, şimdi yeni yedek yükle veya eski telefonundaki yedeği seçerek geri yükle. Geri yükleme mevcut kayıtları güvenli birleştirme kontrolünden geçirir.</p><div id="cmDriveLastInfo" class="hint"></div><div class="row"><button class="bg" onclick="cmDriveManualBackup()">Şimdi Drive’a yedekle</button><button class="b2" onclick="cmDriveListBackups()">Yedekleri listele</button></div><div id="cmDriveBackups"></div>';var anchor=document.getElementById('cmExportHub')||settings.lastElementChild;if(anchor&&anchor.parentNode===settings)anchor.insertAdjacentElement('afterend',card);else settings.appendChild(card);refreshDriveLastInfo();}
+  function refreshDriveLastInfo(){var el=document.getElementById('cmDriveLastInfo');if(!el)return;var d=Number(db.lastDriveBk||0);el.textContent=d?'Bu cihazdan son Drive yüklemesi: '+new Date(d).toLocaleString('tr-TR'):'Bu cihaz için başarılı Drive yükleme tarihi henüz kaydedilmemiş.';}
+  var priorDriveStatus=status;status=function(t){priorDriveStatus(t);refreshDriveLastInfo();};
+  addDriveBackupPanel();if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addDriveBackupPanel);
+  status(db.lastDriveBk?'Drive bağlantısı bu oturumda kapalı. Son yükleme: '+new Date(db.lastDriveBk).toLocaleString('tr-TR')+'. Yedekleri görmek için yeniden bağlan.':'Drive henüz bağlanmadı. Yeni telefonda aynı Google hesabına bağlanıp yedekleri listeleyebilirsin.');
 })();
 </script>
 
