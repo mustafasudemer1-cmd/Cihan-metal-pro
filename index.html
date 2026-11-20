@@ -850,7 +850,7 @@ function v7DeleteCS(id){if(!confirm("Bu kayıt silinsin mi?"))return;db.v7.cs=db
     var items=tx.items||tx.it||[];if(items.length){y+=15;x.fillStyle='#e9edf3';x.fillRect(50,y-25,1000,44);x.fillStyle='#15263b';x.font='bold 18px Arial';x.fillText('Ürün / açıklama',65,y);x.fillText('Miktar',700,y);x.fillText('Tutar',930,y);y+=48;items.forEach(function(it){x.fillStyle='#172033';x.font='18px Arial';x.fillText(String(it.n||'').slice(0,48),65,y);x.fillText(String(it.q||1)+' '+(it.u||''),700,y);x.textAlign='right';x.fillText(fmt((Number(it.q)||1)*(Number(it.p)||0)),1015,y);x.textAlign='left';y+=42;});}
     y+=25;x.fillStyle='#f0f3f6';x.fillRect(50,y,1000,100);x.fillStyle='#15263b';x.font='bold 26px Arial';x.fillText('İŞLEM TUTARI',80,y+60);x.font='bold 36px Arial';x.textAlign='right';x.fillText(fmt(tx.a)+' TL',1015,y+60);x.textAlign='left';
     x.fillStyle='#657184';x.font='18px Arial';x.fillText((db.set.firma||'CİHAN METAL')+' · '+(db.set.tel||''),60,y+145);
-    cvReceipt=cv;cv=cvReceipt;fnm='Fis-'+tx.id;var text=[title+' - '+(db.set.firma||'CİHAN METAL')].concat(rows.map(function(r){return r[0]+': '+r[1]})).concat(['Tutar: '+fmt(tx.a)+' TL','Tel: '+(db.set.tel||'')]).join('\n');showCv(text);
+    window.cv=cv;fnm='Fis-'+tx.id;var text=[title+' - '+(db.set.firma||'CİHAN METAL')].concat(rows.map(function(r){return r[0]+': '+r[1]})).concat(['Tutar: '+fmt(tx.a)+' TL','Tel: '+(db.set.tel||'')]).join('\n');showCv(text);
   };
   // Add a receipt action to every transaction row, including income, expense and transfer.
   var prevFinRender=finRender;finRender=function(){prevFinRender();if(fv==='i'){
