@@ -1576,62 +1576,68 @@ style="position:fixed;left:14px;bottom:calc(78px + env(safe-area-inset-bottom,0p
 
 
 <script>
-/* V8.7 — allow an entered sale total and distribute the rounding/discount across its items. */
+/* V8.8 — reliable manual total and proportional line-price distribution. */
 (function(){
   var amount=document.getElementById('fam');
   if(!amount)return;
   var box=document.createElement('div');
   box.id='cmSaleTotalBreakdown';
   box.style.cssText='margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--soft,transparent);display:none';
-  box.innerHTML='<div class="li"><span>Ürünlerin mevcut toplamı</span><b id="cmSaleBase">0,00 TL</b></div><div class="li"><span id="cmSaleAdjustLabel">İndirim / yuvarlama farkı</span><b id="cmSaleAdjust">0,00 TL</b></div><div class="li" style="font-size:1.05em"><b>Kaydedilecek toplam</b><b id="cmSaleFinal">0,00 TL</b></div><small class="hint">Satış tutarını değiştirdiğinde fark ürünlere oranlı dağıtılır.</small>';
+  box.innerHTML='<div class="li"><span>Ürünlerin mevcut toplamı</span><b id="cmSaleBase">0,00 TL</b></div><div class="li"><span id="cmSaleAdjustLabel">İndirim / yuvarlama farkı</span><b id="cmSaleAdjust">0,00 TL</b></div><div class="li" style="font-size:1.05em"><b>Kaydedilecek toplam</b><b id="cmSaleFinal">0,00 TL</b></div><small class="hint">Tutarı elle değiştirdiğinde fark ürün satırlarına mevcut tutar oranında dağıtılır. Kaydedilen fişin ürün toplamı da bu tutara eşit olur.</small>';
   amount.insertAdjacentElement('afterend',box);
   function money(v){return (Number(v)||0).toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})+' TL';}
-  function num(v){if(typeof fnum==='function')return fnum(v);v=String(v||'').trim().replace(/\./g,'').replace(',','.');return Number(v)||0;}
+  function num(v){if(typeof fnum==='function')return fnum(v);v=String(v||'').trim();if(v.indexOf(',')>=0)v=v.replace(/\./g,'').replace(',','.');return Number(v)||0;}
+  function isItemMode(){return (window.ft==='satis'||window.ft==='gelir')&&Array.isArray(window.fit)&&window.fit.some(function(i){return Number(i.q)>0;});}
   function base(){if(typeof fitSync==='function')fitSync();return typeof fTot==='function'?Number(fTot())||0:0;}
-  window.cmSaleTotalPreview=function(){
-    var active=(window.ft==='satis'||window.ft==='gelir')&&Array.isArray(window.fit)&&window.fit.some(function(i){return Number(i.q)>0;});
-    box.style.display=active?'block':'none';if(!active)return;
-    var b=base(),target=num(amount.value);if(!(target>0))target=b;
+  function preview(){
+    var active=isItemMode();box.style.display=active?'block':'none';if(!active)return;
+    var b=base(),raw=String(amount.value||'').trim(),target=raw?num(raw):b;
     var diff=Math.round((b-target)*100)/100;
     document.getElementById('cmSaleBase').textContent=money(b);
-    document.getElementById('cmSaleAdjustLabel').textContent=diff>0?'İndirim':diff<0?'Yuvarlama / ek tutar':'İndirim / yuvarlama farkı';
+    document.getElementById('cmSaleAdjustLabel').textContent=diff>0?'TL indirim':diff<0?'Yuvarlama / ek tutar':'İndirim / yuvarlama farkı';
     document.getElementById('cmSaleAdjust').textContent=(diff>0?'-':diff<0?'+':'')+money(Math.abs(diff));
-    document.getElementById('cmSaleFinal').textContent=money(target);
-  };
-  amount.addEventListener('input',function(){window.cmSaleTotalPreview();});
-  var oldFitT=window.fitT;
-  if(typeof oldFitT==='function')window.fitT=function(){oldFitT();window.cmSaleTotalPreview();};
-  var oldOpen=window.fOpen;
-  if(typeof oldOpen==='function')window.fOpen=function(){var r=oldOpen.apply(this,arguments);if(window.fe&&window.ft==='satis')amount.value=String(window.fe.a).replace('.',',');window.cmSaleTotalPreview();return r;};
-  var oldSave=window.fSave;
-  if(typeof oldSave==='function')window.fSave=function(){
+    document.getElementById('cmSaleFinal').textContent=money(target>0?target:b);
+  }
+  amount.addEventListener('input',preview);
+  var previousFitT=window.fitT;
+  if(typeof previousFitT==='function')window.fitT=function(){previousFitT();preview();};
+  var previousOpen=window.fOpen;
+  if(typeof previousOpen==='function')window.fOpen=function(){var r=previousOpen.apply(this,arguments);preview();return r;};
+  var previousSave=window.fSave;
+  if(typeof previousSave!=='function')return;
+  window.fSave=function(){
     if(typeof fitSync==='function')fitSync();
     var items=(window.fit||[]).filter(function(i){return Number(i.q)>0;});
-    if(window.ft==='satis'&&items.length){
+    if((window.ft==='satis'||window.ft==='gelir')&&items.length){
       var subtotal=typeof fTot==='function'?Number(fTot())||0:0;
-      var target=num(amount.value);
-      if(!(target>0)){toast('Geçerli satış toplamı gir');return;}
-      if(subtotal>0){
-        var factor=target/subtotal;
-        items.forEach(function(i){i.p=Math.round((Number(i.p)||0)*factor*10000)/10000;});
-        var inputs=document.querySelectorAll('#fil .fip');
-        Array.prototype.forEach.call(inputs,function(el){var i=items[Number(el.dataset.i)];if(i)el.value=String(i.p).replace('.',',');});
+      var entered=String(amount.value||'').trim();
+      var target=entered?num(entered):subtotal;
+      if(!(target>0)){toast('Geçerli toplam tutarı gir');return;}
+      if(!(subtotal>0)){toast('Ürün toplamı sıfır; ürün fiyatlarını kontrol et');return;}
+      var factor=target/subtotal;
+      // Update the live line items, then mirror them into the inputs because the
+      // existing save routine synchronizes from those inputs before calculating.
+      items.forEach(function(item){item.p=Math.max(0,(Number(item.p)||0)*factor);});
+      function writeInputs(){
+        var fields=document.querySelectorAll('#fil .fip');
+        Array.prototype.forEach.call(fields,function(el){var item=window.fit[Number(el.dataset.i)];if(item)el.value=String(Number(item.p).toFixed(8)).replace('.',',');});
       }
-      // Keep the exact requested total despite per-unit display rounding.
-      var adjusted=items.reduce(function(sum,i){return sum+(Number(i.q)||0)*(Number(i.p)||0);},0);
-      if(Math.abs(adjusted-target)>0.02&&items.length){
-        var last=items[items.length-1],q=Number(last.q)||0;
-        if(q>0)last.p=Math.max(0,last.p+(target-adjusted)/q);
-        var inputs2=document.querySelectorAll('#fil .fip'),lastIndex=(window.fit||[]).indexOf(last);
-        Array.prototype.forEach.call(inputs2,function(el){if(Number(el.dataset.i)===lastIndex)el.value=String(last.p).replace('.',',');});
-      }
-      amount.value=String(target.toFixed(2)).replace('.',',');
+      writeInputs();
+      if(typeof fitSync==='function')fitSync();
+      // Correct any floating-point remainder on the last line, accounting for VAT.
+      var actual=typeof fTot==='function'?Number(fTot())||0:0;
+      var rate=num(document.getElementById('fkr')?document.getElementById('fkr').value:0);
+      var vatFactor=document.getElementById('fkm')&&document.getElementById('fkm').value==='h'?1+rate/100:1;
+      var last=items[items.length-1],q=Number(last.q)||0;
+      if(q>0&&Math.abs(target-actual)>0.000001){last.p=Math.max(0,(Number(last.p)||0)+(target-actual)/(q*vatFactor));writeInputs();if(typeof fitSync==='function')fitSync();}
+      // The base save function computes the saved total from fTot(); keep the
+      // visible total synchronized with that exact computed value.
+      var finalTotal=typeof fTot==='function'?Number(fTot())||0:target;
+      amount.value=finalTotal.toFixed(2).replace('.',',');
     }
-    var result=oldSave.apply(this,arguments);
-    window.cmSaleTotalPreview();
-    return result;
+    return previousSave.apply(this,arguments);
   };
-  window.cmSaleTotalPreview();
+  preview();
 })();
 </script>
 
