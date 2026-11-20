@@ -1829,4 +1829,64 @@ style="position:fixed;left:14px;bottom:calc(78px + env(safe-area-inset-bottom,0p
 })();
 </script>
 
+<script>
+/* V9.2 — single authoritative transaction save path. Overrides legacy save wrappers. */
+(function(){
+  'use strict';
+  var $=window.$||function(id){return document.getElementById(id);};
+  function num(v){return typeof window.fnum==='function'?window.fnum(v):(Number(String(v==null?'':v).replace(/\./g,'').replace(',','.'))||0);}
+  function r2(v){return Math.round((Number(v)||0)*100)/100;}
+  function cloneLines(a){return (a||[]).map(function(z){return {n:z.n,u:z.u,q:Number(z.q)||0,p:Number(z.p)||0};});}
+  function syncPriceInputs(){var els=document.querySelectorAll('#fil .fip');Array.prototype.forEach.call(els,function(el){var it=window.fit&&window.fit[Number(el.dataset.i)];if(it)el.value=String(Number(it.p).toFixed(8)).replace('.',',');});}
+  window.fSave=function(){
+    if(typeof window.fitSync==='function')window.fitSync();
+    var type=window.ft, all=Array.isArray(window.fit)?window.fit:[], lines=all.filter(function(z){return Number(z.q)>0;});
+    var amount=$('fam'), entered=amount?String(amount.value||'').trim():'';
+    var hasLines=lines.length>0 && ['gelir','satis','alis'].indexOf(type)>=0;
+    var gross=entered?num(entered):(hasLines&&typeof window.fTot==='function'?Number(window.fTot())||0:0);
+    if(!(gross>0)){toast('Geçerli tutar gir');return;}
+    var disc=(typeof window.cmV90GetDiscount==='function'&&['gelir','gider','satis'].indexOf(type)>=0)?window.cmV90GetDiscount(gross):{mode:'none',value:0,amount:0,net:gross};
+    if(disc.amount>gross||!(disc.net>0)){toast('İskonto sonrası tutar sıfır olamaz');return;}
+    var net=r2(disc.net);
+    // Product-line totals are adjusted to the saved net amount for every item transaction.
+    if(hasLines){
+      var subtotal=Number(window.fTot())||0;
+      if(!(subtotal>0)){toast('Ürün toplamı sıfır; ürün fiyatlarını kontrol et');return;}
+      var factor=net/subtotal;
+      lines.forEach(function(z){z.p=Math.max(0,(Number(z.p)||0)*factor);});
+      syncPriceInputs();window.fitSync();
+      var actual=Number(window.fTot())||0;
+      var vatMode=$('fkm')?$('fkm').value:'y',rate=$('fkr')?num($('fkr').value):0,vatFactor=vatMode==='h'?1+rate/100:1;
+      var last=lines[lines.length-1],qty=Number(last.q)||0;
+      if(qty>0&&Math.abs(net-actual)>0.000001){last.p=Math.max(0,(Number(last.p)||0)+(net-actual)/(qty*vatFactor));syncPriceInputs();window.fitSync();}
+    }
+    var old=window.fe||null, id=old?old.id:nextTxId();
+    var x={id:id,d:$('fd').value||day(0),type:type,a:net,no:$('fno2').value.trim()};
+    if(['gelir','gider'].indexOf(type)>=0)x.k=$('fk').value==='__n'?'':$('fk').value;
+    if(hasLines){x.it=cloneLines(lines);x.items=cloneLines(lines);x.km=$('fkm').value;x.kr=num($('fkr').value);}
+    if(disc.amount>0){x.gross=r2(gross);x.discountMode=disc.mode;x.discountValue=disc.value;x.discountAmount=r2(disc.amount);}else{delete x.gross;delete x.discountMode;delete x.discountValue;delete x.discountAmount;}
+    if(['satis','alis'].indexOf(type)>=0&&$('fvd').value)x.vd=$('fvd').value;
+    if(type==='transfer'){
+      x.acc=+$('fa').value;x.acc2=+$('fa2').value;
+      if(!x.acc||!x.acc2||x.acc===x.acc2){toast('Kaynak ve hedef hesap farklı olmalı');return;}
+    } else if(['gelir','gider','satis','odeme','tahsilat','iade'].indexOf(type)>=0){var av=+$('fa').value;if(av)x.acc=av;}
+    if(['satis','odeme','tahsilat','iade'].indexOf(type)>=0||(window.fContextCar&&['gelir','gider'].indexOf(type)>=0)){
+      var cv=+$('fc').value;if(cv)x.car=cv;
+    }
+    if(type==='satis'&&!x.acc&&!x.car){toast('Satış için hesap veya cari seç');return;}
+    if(type==='satis'&&x.acc&&x.car){toast('Satışta ya hesap ya cari seç; ikisini birden seçme');return;}
+    if((type==='odeme'||type==='tahsilat')&&(!x.acc||!x.car)){toast('Ödeme / tahsilat için hem hesap hem cari seç');return;}
+    if(type==='iade'){x.refundDir=$('frefund').value;if(!x.acc&&!x.car){toast('İade için hesap veya cari seç');return;}}
+    if(type==='transfer'&&x.car)delete x.car;
+    var idx=old?F.tx.indexOf(old):-1;if(idx>=0)F.tx[idx]=x;else F.tx.push(x);
+    if(typeof fPhSave==='function')fPhSave(x.id);
+    // Purchase cost refresh only for newly created purchase transactions.
+    if(type==='alis'&&!old&&hasLines){db.costMap=db.costMap||{};lines.forEach(function(it){var q=Number(it.q)||0,p=Number(it.p)||0;if(!it.n||q<=0)return;var stockNow=typeof stk==='function'?Number(stk(it.n))||q:q,stockBefore=Math.max(0,stockNow-q),oldCost=Number(db.costMap[it.n])||0;db.costMap[it.n]=oldCost>0&&stockBefore>0?((stockBefore*oldCost)+(q*p))/(stockBefore+q):p;});}
+    save();
+    $('fo').style.display='none';fm=x.d.slice(0,7);
+    if($('fcd').style.display==='block')fCd(fcur);else{fv='i';finRender();}v7Home();
+    return x;
+  };
+})();
 
+</script>
