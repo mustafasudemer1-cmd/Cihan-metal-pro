@@ -1544,9 +1544,38 @@ style="position:fixed;left:14px;bottom:calc(78px + env(safe-area-inset-bottom,0p
     host.insertAdjacentHTML('beforeend','<div class="card" id="cmV85Profit"><b>Ürün maliyetlerine göre kârlılık</b><small class="hint" style="display:block">Yalnızca tüm ürün maliyetleri girilmiş ve ürün kalemleri bulunan satışlar hesaba katılır.</small><div class="v7grid"><div class="v7tile"><small>Hesaplanan satış</small><b>'+money85(p.sales)+'</b></div><div class="v7tile"><small>Ürün maliyeti</small><b>'+money85(p.cost)+'</b></div><div class="v7tile"><small>Brüt kâr</small><b>'+money85(p.gross)+'</b></div><div class="v7tile"><small>Giderler</small><b>'+money85(p.expenses)+'</b></div><div class="v7tile"><small>Diğer gelir</small><b>'+money85(p.income)+'</b></div><div class="v7tile"><small>Tahmini faaliyet sonucu</small><b>'+money85(p.net)+'</b></div></div><div class="hint">Maliyeti eksik veya ürün detayı bulunmayan satış: '+p.unknown+' · Hesaplanan satış: '+p.known+'. Tahsilatlar ve tedarikçi ödemeleri kâr hesabına ikinci kez eklenmez. Vergi, finansman ve amortisman gibi muhasebe kalemleri dahil değildir.</div><h4>Müşteri bazında brüt kâr</h4>'+(p.customers.length?p.customers.map(function(c){return '<div class="li"><span>'+esc85(c.name)+'<small>'+c.count+' satış</small></span><b>'+money85(c.profit)+'</b></div>';}).join(''):'<div class="empty">Hesaplanabilir satış bulunamadı.</div>')+'<div class="row" style="margin-top:10px"><button class="b2" onclick="cmV85ExportProfit()">Kârlılık CSV indir</button><button class="b2" onclick="cmV85PrintProfit()">Yazdır / PDF kaydet</button></div></div>');
   }
   window.cmV85ExportProfit=function(){var p=profit85(),rows=[['Dönem',p.range],['Hesaplanan satış',p.sales],['Ürün maliyeti',p.cost],['Brüt kâr',p.gross],['Gider',p.expenses],['Diğer gelir',p.income],['Tahmini faaliyet sonucu',p.net],['Eksik maliyetli satış',p.unknown]].concat(p.customers.map(function(c){return ['Müşteri: '+c.name,c.profit];}));csvDownload('cihan-metal-karlilik.csv',['Kalem','Tutar / Bilgi'],rows);};
-  window.cmV85PrintProfit=function(){var p=profit85(),rows=p.customers.map(function(c){return '<tr><td>'+esc85(c.name)+'</td><td>'+c.count+'</td><td>'+money85(c.sales)+'</td><td>'+money85(c.cost)+'</td><td>'+money85(c.profit)+'</td></tr>';}).join('');var w=window.open('','_blank');if(!w){toast('Yazdırma penceresi açılamadı. Tarayıcı açılır pencere iznini kontrol et.');return;}w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Kârlılık raporu</title><style>body{font:14px Arial;padding:24px}h1{font-size:22px}table{width:100%;border-collapse:collapse}td,th{border:1px solid #ccc;padding:8px;text-align:left}</style></head><body><h1>Cihan Metal Pro · Kârlılık raporu</h1><p>'+p.range+'</p><p>Satış: '+money85(p.sales)+' · Maliyet: '+money85(p.cost)+' · Brüt kâr: '+money85(p.gross)+' · Gider: '+money85(p.expenses)+' · Tahmini faaliyet sonucu: '+money85(p.net)+'</p><table><tr><th>Müşteri</th><th>Satış</th><th>Ciro</th><th>Maliyet</th><th>Brüt kâr</th></tr>'+rows+'</table><p>Yalnızca maliyeti girilmiş ürün kalemleri içeren satışlar hesaplanmıştır.</p><script>window.onload=function(){window.print();};<\/script>
-<script>
+  window.cmV85PrintProfit=function(){var p=profit85(),rows=p.customers.map(function(c){return '<tr><td>'+esc85(c.name)+'</td><td>'+c.count+'</td><td>'+money85(c.sales)+'</td><td>'+money85(c.cost)+'</td><td>'+money85(c.profit)+'</td></tr>';}).join('');var w=window.open('','_blank');if(!w){toast('Yazdırma penceresi açılamadı. Tarayıcı açılır pencere iznini kontrol et.');return;}w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Kârlılık raporu</title><style>body{font:14px Arial;padding:24px}h1{font-size:22px}table{width:100%;border-collapse:collapse}td,th{border:1px solid #ccc;padding:8px;text-align:left}</style></head><body><h1>Cihan Metal Pro · Kârlılık raporu</h1><p>'+p.range+'</p><p>Satış: '+money85(p.sales)+' · Maliyet: '+money85(p.cost)+' · Brüt kâr: '+money85(p.gross)+' · Gider: '+money85(p.expenses)+' · Tahmini faaliyet sonucu: '+money85(p.net)+'</p><table><tr><th>Müşteri</th><th>Satış</th><th>Ciro</th><th>Maliyet</th><th>Brüt kâr</th></tr>'+rows+'</table><p>Yalnızca maliyeti girilmiş ürün kalemleri içeren satışlar hesaplanmıştır.</p><script>window.onload=function(){window.print();};<\/script></body></html>');w.document.close();};
 
+  // Update weighted-average product cost when a purchase transaction with item lines is saved.
+  var oldFSave85=window.fSave;
+  window.fSave=function(){
+    var wasType=ft, editId=fe&&fe.id, beforeCount=F.tx.length;
+    var lines=Array.isArray(fit)?JSON.parse(JSON.stringify(fit)):[]; 
+    var result=oldFSave85.apply(this,arguments);
+    if(wasType==='alis' && lines.length){
+      var saved=editId?F.tx.find(function(x){return String(x.id)===String(editId);}):F.tx.slice().reverse().find(function(x){return x.type==='alis';});
+      if(saved&&saved.type==='alis'&&Array.isArray(saved.it)){
+        saved.it.forEach(function(it){
+          var n=it.n,qty=Number(it.q)||0,price=Number(it.p)||0;
+          if(!n||qty<=0||price<0)return;
+          var stockNow=typeof stk==='function'?Number(stk(n))||0:qty;
+          var stockBefore=Math.max(0,stockNow-qty),oldCost=db.costMap&&Number(db.costMap[n]);
+          db.costMap=db.costMap||{};
+          db.costMap[n]=oldCost>0&&stockBefore>0?((stockBefore*oldCost)+(qty*price))/(stockBefore+qty):price;
+        });
+        save();
+      }
+    }
+    return result;
+  };
+  var oldReport85=window.v7Report;
+  window.v7Report=function(){oldReport85();renderProfit85();};
+  addHomeSearch();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addHomeSearch);
+})();
+</script>
+
+<script>
 /* V8.9 — persist manually entered total in both transaction and receipt. */
 (function(){
   var amount=document.getElementById('fam');
@@ -1599,7 +1628,6 @@ style="position:fixed;left:14px;bottom:calc(78px + env(safe-area-inset-bottom,0p
     return savedResult;
   };
 })();
-
 </script>
 <script>
 /* Cihan Metal Pro V9.0: transaction discounts + durable photo backup/restore */
@@ -1625,6 +1653,7 @@ style="position:fixed;left:14px;bottom:calc(78px + env(safe-area-inset-bottom,0p
     return {mode:mode,value:v,amount:d,net:round(Math.max(0,gross-d))};
   }
   function preview(){var a=$('fam'),p=$('cmV90Preview');if(!a||!p)return;var gross=Math.max(0,n(a.value)),d=getDiscount(gross);p.textContent='Ara toplam: '+money(gross)+' · İskonto: '+money(d.amount)+' · Net tutar: '+money(d.net);}
+  window.cmV90GetDiscount=getDiscount;
   addDiscountUI();
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addDiscountUI);
 
@@ -1637,25 +1666,7 @@ style="position:fixed;left:14px;bottom:calc(78px + env(safe-area-inset-bottom,0p
       if($('cmV90Value'))$('cmV90Value').value=tx&&tx.discountValue!=null?String(tx.discountValue).replace('.',','):'';
       preview();return r;};
   }
-  if(typeof window.fSave==='function'){
-    var save0=window.fSave;
-    window.fSave=function(){
-      var amount=$('fam'),gross=amount?Math.max(0,n(amount.value)):0,d=getDiscount(gross);
-      if(d.amount>gross){if(typeof toast==='function')toast('İskonto tutarı toplamı aşamaz');return;}
-      if(d.amount>0&&d.net<=0){if(typeof toast==='function')toast('İskonto sonrası tutar sıfır olamaz');return;}
-      if(amount)amount.value=String(d.net.toFixed(2)).replace('.',',');
-      var before=window.F&&Array.isArray(F.tx)?F.tx.map(function(x){return x.id;}):[];
-      var editing=window.fe&&fe.id?fe.id:null,typ=window.ft,form=$('fo'),wasOpen=!!(form&&form.style.display==='block');
-      var result;
-      try{result=save0.apply(this,arguments);}finally{if(amount)amount.value=String(gross.toFixed(2)).replace('.',',');}
-      if(wasOpen&&form&&form.style.display!=='block'&&window.F&&Array.isArray(F.tx)){
-        var tx=editing?F.tx.filter(function(x){return x.id==editing;})[0]:null;
-        if(!tx){for(var i=F.tx.length-1;i>=0;i--)if(before.indexOf(F.tx[i].id)<0&&F.tx[i].type===typ){tx=F.tx[i];break;}}
-        if(tx){tx.gross=round(gross);tx.discountMode=d.mode;tx.discountValue=d.value;tx.discountAmount=d.amount;tx.a=d.net;if(typeof save==='function')save();}
-      }
-      return result;
-    };
-  }
+  // Saving and discount application are handled together by the final transaction-save wrapper below.
   // Keep discount details visible in the shareable sales receipt text.
   if(typeof window.saleText==='function'){
     var saleText0=window.saleText;
@@ -1669,7 +1680,7 @@ style="position:fixed;left:14px;bottom:calc(78px + env(safe-area-inset-bottom,0p
   function parseObj(v){if(!v)return {};try{return JSON.parse(v)||{};}catch(e){return {};}}
   // Strict getter returns parsed objects; used only for safe snapshots.
   if(!window.v8GetStrict){window.v8GetStrict=function(k){
-    try{if(window.indexedDB)return new Promise(function(resolve){var req=indexedDB.open('cihan-kv',1);req.onsuccess=function(){var dbi=req.result,tx=dbi.transaction('kv','readonly'),q=tx.objectStore('kv').get(k);q.onsuccess=function(){resolve(parseObj(q.result));};q.onerror=function(){resolve(parseObj(localStorage.getItem(k)));};};req.onerror=function(){resolve(parseObj(localStorage.getItem(k)));};});}catch(e){}
+    try{if(window.indexedDB)return new Promise(function(resolve){var req=indexedDB.open('cihan-kv',1);req.onupgradeneeded=function(){if(!req.result.objectStoreNames.contains('kv'))req.result.createObjectStore('kv');};req.onsuccess=function(){var dbi=req.result,done=false;function finish(v){if(done)return;done=true;try{dbi.close();}catch(e){}resolve(v);}try{var tx=dbi.transaction('kv','readonly'),q=tx.objectStore('kv').get(k);q.onsuccess=function(){finish(parseObj(q.result!=null?q.result:localStorage.getItem(k)));};q.onerror=function(){finish(parseObj(localStorage.getItem(k)));};tx.onerror=function(){finish(parseObj(localStorage.getItem(k)));};}catch(e){finish(parseObj(localStorage.getItem(k)));}};req.onerror=function(){resolve(parseObj(localStorage.getItem(k)));};});}catch(e){}
     return Promise.resolve(parseObj(localStorage.getItem(k)));
   };}
   function readStored(key){
@@ -1740,38 +1751,7 @@ style="position:fixed;left:14px;bottom:calc(78px + env(safe-area-inset-bottom,0p
   };
   addDiscountUI();
 })();
-
 </script>
-</body></html>');w.document.close();};
-  // Update weighted-average product cost when a purchase transaction with item lines is saved.
-  var oldFSave85=window.fSave;
-  window.fSave=function(){
-    var wasType=ft, editId=fe&&fe.id, beforeCount=F.tx.length;
-    var lines=Array.isArray(fit)?JSON.parse(JSON.stringify(fit)):[]; 
-    var result=oldFSave85.apply(this,arguments);
-    if(wasType==='alis' && lines.length){
-      var saved=editId?F.tx.find(function(x){return String(x.id)===String(editId);}):F.tx.slice().reverse().find(function(x){return x.type==='alis';});
-      if(saved&&saved.type==='alis'&&Array.isArray(saved.it)){
-        saved.it.forEach(function(it){
-          var n=it.n,qty=Number(it.q)||0,price=Number(it.p)||0;
-          if(!n||qty<=0||price<0)return;
-          var stockNow=typeof stk==='function'?Number(stk(n))||0:qty;
-          var stockBefore=Math.max(0,stockNow-qty),oldCost=db.costMap&&Number(db.costMap[n]);
-          db.costMap=db.costMap||{};
-          db.costMap[n]=oldCost>0&&stockBefore>0?((stockBefore*oldCost)+(qty*price))/(stockBefore+qty):price;
-        });
-        save();
-      }
-    }
-    return result;
-  };
-  var oldReport85=window.v7Report;
-  window.v7Report=function(){oldReport85();renderProfit85();};
-  addHomeSearch();
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addHomeSearch);
-})();
-</script>
-
 
 <script>
 /* V8.8 — reliable manual total and proportional line-price distribution. */
@@ -1789,10 +1769,11 @@ style="position:fixed;left:14px;bottom:calc(78px + env(safe-area-inset-bottom,0p
   function base(){if(typeof fitSync==='function')fitSync();return typeof fTot==='function'?Number(fTot())||0:0;}
   function preview(){
     var active=isItemMode();box.style.display=active?'block':'none';if(!active)return;
-    var b=base(),raw=String(amount.value||'').trim(),target=raw?num(raw):b;
-    var diff=Math.round((b-target)*100)/100;
+    var b=base(),raw=String(amount.value||'').trim(),gross=raw?num(raw):b;
+    var discount=typeof window.cmV90GetDiscount==='function'?window.cmV90GetDiscount(gross):{amount:0,net:gross};
+    var target=discount.net,diff=Math.round((b-target)*100)/100;
     document.getElementById('cmSaleBase').textContent=money(b);
-    document.getElementById('cmSaleAdjustLabel').textContent=diff>0?'TL indirim':diff<0?'Yuvarlama / ek tutar':'İndirim / yuvarlama farkı';
+    document.getElementById('cmSaleAdjustLabel').textContent='Ürün toplamı ile net tutar farkı';
     document.getElementById('cmSaleAdjust').textContent=(diff>0?'-':diff<0?'+':'')+money(Math.abs(diff));
     document.getElementById('cmSaleFinal').textContent=money(target>0?target:b);
   }
@@ -1806,36 +1787,45 @@ style="position:fixed;left:14px;bottom:calc(78px + env(safe-area-inset-bottom,0p
   window.fSave=function(){
     if(typeof fitSync==='function')fitSync();
     var items=(window.fit||[]).filter(function(i){return Number(i.q)>0;});
-    if((window.ft==='satis'||window.ft==='gelir')&&items.length){
+    var type=window.ft,hasLines=(type==='satis'||type==='gelir')&&items.length>0;
+    var entered=String(amount.value||'').trim();
+    var gross=entered?num(entered):(hasLines&&typeof fTot==='function'?Number(fTot())||0:0);
+    if(!(gross>0)){toast('Geçerli toplam tutarı gir');return;}
+    var d=typeof window.cmV90GetDiscount==='function'?window.cmV90GetDiscount(gross):{mode:'none',value:0,amount:0,net:gross};
+    if(d.amount>gross||!(d.net>0)){toast('İskonto sonrası tutar sıfır olamaz veya iskonto toplamı aşamaz');return;}
+    var target=Math.round(d.net*100)/100;
+    if(hasLines){
       var subtotal=typeof fTot==='function'?Number(fTot())||0:0;
-      var entered=String(amount.value||'').trim();
-      var target=entered?num(entered):subtotal;
-      if(!(target>0)){toast('Geçerli toplam tutarı gir');return;}
       if(!(subtotal>0)){toast('Ürün toplamı sıfır; ürün fiyatlarını kontrol et');return;}
       var factor=target/subtotal;
-      // Update the live line items, then mirror them into the inputs because the
-      // existing save routine synchronizes from those inputs before calculating.
       items.forEach(function(item){item.p=Math.max(0,(Number(item.p)||0)*factor);});
-      function writeInputs(){
+      function writePrices(){
         var fields=document.querySelectorAll('#fil .fip');
         Array.prototype.forEach.call(fields,function(el){var item=window.fit[Number(el.dataset.i)];if(item)el.value=String(Number(item.p).toFixed(8)).replace('.',',');});
       }
-      writeInputs();
-      if(typeof fitSync==='function')fitSync();
-      // Correct any floating-point remainder on the last line, accounting for VAT.
+      writePrices();if(typeof fitSync==='function')fitSync();
       var actual=typeof fTot==='function'?Number(fTot())||0:0;
       var rate=num(document.getElementById('fkr')?document.getElementById('fkr').value:0);
       var vatFactor=document.getElementById('fkm')&&document.getElementById('fkm').value==='h'?1+rate/100:1;
-      var last=items[items.length-1],q=Number(last.q)||0;
-      if(q>0&&Math.abs(target-actual)>0.000001){last.p=Math.max(0,(Number(last.p)||0)+(target-actual)/(q*vatFactor));writeInputs();if(typeof fitSync==='function')fitSync();}
-      // The base save function computes the saved total from fTot(); keep the
-      // visible total synchronized with that exact computed value.
-      var finalTotal=typeof fTot==='function'?Number(fTot())||0:target;
-      amount.value=finalTotal.toFixed(2).replace('.',',');
+      var last=items[items.length-1],qty=Number(last.q)||0;
+      if(qty>0&&Math.abs(target-actual)>0.000001){last.p=Math.max(0,(Number(last.p)||0)+(target-actual)/(qty*vatFactor));writePrices();if(typeof fitSync==='function')fitSync();}
     }
-    return previousSave.apply(this,arguments);
-  };
-  preview();
+    var before=(window.F&&Array.isArray(F.tx))?F.tx.map(function(x){return x.id;}):[];
+    var editing=window.fe&&window.fe.id?window.fe.id:null,form=$('fo'),wasOpen=!!(form&&form.style.display==='block');
+    amount.value=target.toFixed(2).replace('.',',');
+    var result=previousSave.apply(this,arguments);
+    if(wasOpen&&form&&form.style.display!=='block'&&window.F&&Array.isArray(F.tx)){
+      var tx=editing?F.tx.filter(function(x){return x.id==editing;})[0]:null;
+      if(!tx){for(var i=F.tx.length-1;i>=0;i--)if(before.indexOf(F.tx[i].id)<0&&F.tx[i].type===type){tx=F.tx[i];break;}}
+      if(tx){
+        tx.gross=Math.round(gross*100)/100;tx.discountMode=d.mode;tx.discountValue=d.value;tx.discountAmount=d.amount;tx.a=target;
+        if(typeof save==='function')save();
+      }
+    }else if(wasOpen&&form&&form.style.display==='block'){
+      amount.value=gross.toFixed(2).replace('.',',');
+    }
+    return result;
+  };  preview();
 })();
 </script>
 
