@@ -1184,5 +1184,46 @@ function v7DeleteCS(id){if(!confirm("Bu kayıt silinsin mi?"))return;db.v7.cs=db
   netAt=function(D){var all=F.tx;F.tx=all.filter(function(x){return x.d<=D});try{var n=0;F.acc.forEach(function(a){n+=accBal(a)});F.car.forEach(function(c){n+=carBal(c)});return n}finally{F.tx=all}};
 })();
 </script>
+
+<script>
+/* V8: teklif görselini önizlemede kullanılan aynı canvas üzerinden paylaş */
+(function(){
+  window.shareImage = async function(){
+    var buttonCanvas = window.cv || cv;
+    try{
+      if(!buttonCanvas || !buttonCanvas.width || !buttonCanvas.height){
+        throw new Error('Önce teklif önizlemesini açmalısın.');
+      }
+      var blob = await canvasBlob(buttonCanvas,'image/jpeg',0.94);
+      if(!blob || !blob.size) throw new Error('Teklif resmi oluşturulamadı.');
+      var name = (typeof fname==='function' ? fname('jpg') : 'cihan-metal-teklif.jpg');
+      var file = new File([blob],name,{type:'image/jpeg'});
+      if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+        try{
+          await navigator.share({files:[file],title:'Cihan Metal fiyat teklifi',text:'Fiyat teklifi'});
+          return;
+        }catch(shareError){
+          if(shareError && shareError.name==='AbortError') return;
+          /* Paylaşım paneli dosyayı kabul etmezse indirmeye düş. */
+        }
+      }
+      await out(name,blob);
+      toast('Teklif resmi indirildi. WhatsApp veya Drive üzerinden ekleyebilirsin.');
+    }catch(e){
+      toast('Teklif resmi paylaşılamadı: '+(e && e.message ? e.message : e));
+    }
+  };
+  window.savePng = async function(){
+    try{
+      var canvas = window.cv || cv;
+      if(!canvas || !canvas.width) throw new Error('Önce teklif önizlemesini açmalısın.');
+      var blob = await canvasBlob(canvas,'image/jpeg',0.94);
+      await out(typeof fname==='function'?fname('jpg'):'cihan-metal-teklif.jpg',blob);
+      toast('Teklif resmi indirildi.');
+    }catch(e){toast('Resim indirilemedi: '+(e && e.message ? e.message : e));}
+  };
+})();
+</script>
+
 </body>
 </html>
