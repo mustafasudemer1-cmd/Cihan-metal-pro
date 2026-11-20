@@ -74,7 +74,7 @@ h3{font-size:15px;font-weight:800;letter-spacing:.1px}.hint{font-size:12px;line-
 </style>
 <meta name="theme-color" content="#202a36">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 
 <style>
 /* Cihan Metal Pro unified dashboard refresh; existing V7 modules and data IDs retained */
@@ -828,5 +828,47 @@ function v7DeleteCS(id){if(!confirm("Bu kayıt silinsin mi?"))return;db.v7.cs=db
 })();
 </script>
 
+<script>
+(function(){
+  // Universal receipt: every ledger transaction gets its own printable/shareable receipt.
+  var txLabel={gelir:'GELİR FİŞİ',gider:'GİDER FİŞİ',transfer:'HESAPLAR ARASI TRANSFER FİŞİ',tahsilat:'TAHSİLAT FİŞİ',odeme:'ÖDEME FİŞİ',satis:'CARİ SATIŞ FİŞİ',satis_nakit:'PEŞİN SATIŞ FİŞİ',alis:'ALIŞ FİŞİ',iade:'İADE FİŞİ'};
+  window.generalReceipt=function(id){
+    var tx=F.tx.filter(function(z){return String(z.id)===String(id)})[0];if(!tx){toast('İşlem bulunamadı');return;}
+    var car=F.car.filter(function(z){return z.id==tx.car})[0],acc=F.acc.filter(function(z){return z.id==tx.acc})[0],acc2=F.acc.filter(function(z){return z.id==tx.acc2})[0];
+    var title=txLabel[tx.type]||((TY[tx.type]||'İŞLEM').toLocaleUpperCase('tr-TR')+' FİŞİ');
+    var rows=[['Fiş / işlem no',String(tx.id)],['Tarih',dt(tx.d)],['İlgili cari',car?car.n:(tx.customer||'-')],['Hesap',acc?acc.n:'-']];
+    if(tx.type==='transfer')rows.push(['Hedef hesap',acc2?acc2.n:'-']);
+    if(tx.k)rows.push(['Kategori / açıklama',tx.k]);if(tx.no)rows.push(['Not / belge no',tx.no]);
+    if(tx.method)rows.push(['Ödeme yöntemi',tx.method]);
+    var cv=document.createElement('canvas');cv.width=1100;cv.height=Math.max(850,520+((tx.items||tx.it||[]).length)*48);var x=cv.getContext('2d');
+    x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.fillStyle='#202a35';x.fillRect(0,0,1100,170);x.fillStyle='#fff';x.font='bold 42px Arial';x.fillText(db.set.firma||'CİHAN METAL',55,70);x.font='bold 29px Arial';x.fillText(title,55,125);
+    var y=235;rows.forEach(function(r){x.fillStyle='#657184';x.font='20px Arial';x.fillText(r[0],65,y);x.fillStyle='#172033';x.font='bold 22px Arial';x.fillText(String(r[1]).slice(0,55),360,y);y+=49;});
+    var items=tx.items||tx.it||[];if(items.length){y+=15;x.fillStyle='#e9edf3';x.fillRect(50,y-25,1000,44);x.fillStyle='#15263b';x.font='bold 18px Arial';x.fillText('Ürün / açıklama',65,y);x.fillText('Miktar',700,y);x.fillText('Tutar',930,y);y+=48;items.forEach(function(it){x.fillStyle='#172033';x.font='18px Arial';x.fillText(String(it.n||'').slice(0,48),65,y);x.fillText(String(it.q||1)+' '+(it.u||''),700,y);x.textAlign='right';x.fillText(fmt((Number(it.q)||1)*(Number(it.p)||0)),1015,y);x.textAlign='left';y+=42;});}
+    y+=25;x.fillStyle='#f0f3f6';x.fillRect(50,y,1000,100);x.fillStyle='#15263b';x.font='bold 26px Arial';x.fillText('İŞLEM TUTARI',80,y+60);x.font='bold 36px Arial';x.textAlign='right';x.fillText(fmt(tx.a)+' TL',1015,y+60);x.textAlign='left';
+    x.fillStyle='#657184';x.font='18px Arial';x.fillText((db.set.firma||'CİHAN METAL')+' · '+(db.set.tel||''),60,y+145);
+    cvReceipt=cv;cv=cvReceipt;fnm='Fis-'+tx.id;var text=[title+' - '+(db.set.firma||'CİHAN METAL')].concat(rows.map(function(r){return r[0]+': '+r[1]})).concat(['Tutar: '+fmt(tx.a)+' TL','Tel: '+(db.set.tel||'')]).join('\n');showCv(text);
+  };
+  // Add a receipt action to every transaction row, including income, expense and transfer.
+  var prevFinRender=finRender;finRender=function(){prevFinRender();if(fv==='i'){
+    [].slice.call($('fbody').querySelectorAll('.card.li')).forEach(function(card){if(card.querySelector('[data-general-receipt]'))return;var existing=[].slice.call(card.querySelectorAll('button')).filter(function(z){return z.textContent.trim()==='Fiş'})[0];if(existing){existing.setAttribute('data-general-receipt','1');return;}var oc=card.getAttribute('onclick')||'',m=oc.match(/fOpen\((\d+)/);if(!m)return;var b=document.createElement('button');b.className='b2';b.textContent='Fiş';b.setAttribute('data-general-receipt','1');b.onclick=function(e){e.stopPropagation();generalReceipt(m[1]);};card.appendChild(b);});
+  }};
+  var prevFcd=fCd;fCd=function(id){prevFcd(id);[].slice.call($('fcb').querySelectorAll('.card.li')).forEach(function(card){if(card.querySelector('[data-general-receipt]'))return;var existing=[].slice.call(card.querySelectorAll('button')).filter(function(z){return z.textContent.trim()==='Fiş'})[0];if(existing){existing.setAttribute('data-general-receipt','1');return;}var oc=card.getAttribute('onclick')||'',m=oc.match(/fOpen\((\d+)/);if(!m)return;var b=document.createElement('button');b.className='b2';b.textContent='Fiş';b.setAttribute('data-general-receipt','1');b.onclick=function(e){e.stopPropagation();generalReceipt(m[1]);};card.appendChild(b);});};
+  // Attach multiple photos/documents to each customer or supplier record.
+  var carDocs={};try{carDocs=JSON.parse(localStorage.getItem('tp_car_docs')||'{}')||{};}catch(e){}
+  function saveCarDocs(){try{localStorage.setItem('tp_car_docs',JSON.stringify(carDocs));}catch(e){toast('Belge kaydedilemedi; telefon depolaması dolu olabilir.');}}
+  window.carDocAdd=function(input){var f=input.files&&input.files[0];input.value='';if(!f||!fcur)return;var im=new Image();im.onload=function(){var scale=Math.min(1,1400/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*scale);c.height=Math.round(im.height*scale);c.getContext('2d').drawImage(im,0,0,c.width,c.height);var data=c.toDataURL('image/jpeg',.72);(carDocs[fcur]||(carDocs[fcur]=[])).push({id:Date.now(),name:f.name||'Cari belgesi',date:day(0),data:data});saveCarDocs();fCd(fcur);toast('Cari belgesi eklendi');};im.onerror=function(){toast('Fotoğraf okunamadı');};im.src=URL.createObjectURL(f);};
+  window.carDocDelete=function(cid,did){if(!confirm('Bu belge silinsin mi?'))return;carDocs[cid]=(carDocs[cid]||[]).filter(function(z){return z.id!==did;});saveCarDocs();fCd(cid);};
+  window.carDocOpen=function(cid,did){var d=(carDocs[cid]||[]).filter(function(z){return z.id===did})[0];if(!d)return;var w=window.open();if(w){w.document.write('<title>'+String(d.name).replace(/[<>]/g,'')+'</title><img style="max-width:100%" src="'+d.data+'">');}else{var a=document.createElement('a');a.href=d.data;a.download=d.name||'cari-belge.jpg';a.click();}};
+  var prevFcdDocs=fCd;fCd=function(id){prevFcdDocs(id);var docs=carDocs[id]||[],html='<div class="card" style="margin-top:12px"><b>Cari fotoğraf ve belgeleri</b><div class="row" style="margin-top:8px"><button class="b2" onclick="document.getElementById(\'carDocCamera\').click()">📷 Kamera</button><button class="b2" onclick="document.getElementById(\'carDocGallery\').click()">🖼 Galeri</button></div><input id="carDocCamera" type="file" accept="image/*" capture="environment" style="display:none" onchange="carDocAdd(this)"><input id="carDocGallery" type="file" accept="image/*" style="display:none" onchange="carDocAdd(this)">';
+    html+=docs.length?docs.map(function(d){return '<div class="li" style="margin-top:10px"><img src="'+d.data+'" style="width:58px;height:58px;object-fit:cover;border-radius:8px" onclick="carDocOpen('+id+','+d.id+')"><div style="flex:1;min-width:0"><b>'+String(d.name).replace(/[<>]/g,'')+'</b><small>'+dt(d.date)+'</small></div><button class="b2" onclick="carDocOpen('+id+','+d.id+')">Aç</button><button class="br" onclick="carDocDelete('+id+','+d.id+')">Sil</button></div>';}).join(''):'<small style="display:block;margin-top:8px;color:var(--mut)">Bu cariye henüz belge eklenmedi.</small>';
+    html+='</div>';var target=$('fcb');if(target)target.insertAdjacentHTML('beforeend',html);
+  };
+  // Include customer/supplier documents in the existing manual + Drive backup file.
+  var oldBkObj=bkObj;bkObj=function(){var o=oldBkObj();o.carPhotos=carDocs;return o;};
+  restore=function(inp){var file=inp.files&&inp.files[0];if(!file)return;var rd=new FileReader();rd.onload=function(){try{var o=JSON.parse(rd.result);if(!o.prods||!o.quotes)throw new Error('Geçersiz yedek');var ph=o.photos||{},cd=o.carPhotos||{};delete o.photos;delete o.carPhotos;ask('Yedek yüklensin mi? Mevcut veriler yedektekiyle değişir.',function(){db=o;save();carDocs=cd;try{localStorage.setItem('tpph',JSON.stringify(ph));localStorage.setItem('tp_car_docs',JSON.stringify(carDocs));}catch(e){}location.reload();},'Yükle');}catch(e){toast('Yedek dosyası okunamadı');}};rd.readAsText(file);inp.value='';};
+  saveCarDocs();
+})();
+
+</script>
 </body>
 </html>
