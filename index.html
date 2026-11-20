@@ -1140,5 +1140,112 @@ function v7DeleteCS(id){if(!confirm("Bu kayıt silinsin mi?"))return;db.v7.cs=db
 })();
 </script>
 
+
+<script>
+/* Cihan Metal Pro V7 — receipt identity repair.
+   Preserve all existing records; only duplicate IDs are reassigned. */
+(function(){
+  function uniqueIds(list, label){
+    if(!Array.isArray(list)) return [];
+    var seen=Object.create(null), duplicates=[];
+    list.forEach(function(item){
+      if(!item || item.id===undefined || item.id===null) return;
+      var key=String(item.id);
+      if(seen[key]){
+        var old=item.id, fresh=Date.now();
+        while(seen[String(fresh)]) fresh++;
+        item.id=fresh;
+        seen[String(fresh)]=true;
+        duplicates.push({old:old, item:item});
+      }else seen[key]=true;
+    });
+    return duplicates;
+  }
+  function nextUnique(list){
+    var used=Object.create(null);
+    (list||[]).forEach(function(x){if(x&&x.id!=null)used[String(x.id)]=true;});
+    var id=Date.now();
+    while(used[String(id)]) id++;
+    return id;
+  }
+
+  // Fix duplicate sales/finance transaction IDs. Keep the first historical ID
+  // so existing references and photo keys continue to resolve as before.
+  var txDuplicates=uniqueIds(window.F && F.tx, 'transaction');
+  // Fix duplicate receipt/makbuz IDs independently.
+  uniqueIds(window.db && db.recs, 'receipt');
+
+  // Reconnect quote-to-sale references where the quote number makes the match exact.
+  if(txDuplicates.length && window.db && Array.isArray(db.quotes)){
+    db.quotes.forEach(function(q){
+      var match=txDuplicates.find(function(d){
+        return d.item && String(d.item.no||'')===String(q.no||'');
+      });
+      if(match) q.sold=match.item.id;
+    });
+  }
+
+  window.nextTxId=function(){return nextUnique(F.tx);};
+
+  // Every saved receipt row opens its own object, not a shared/latest receipt.
+  window.openRec=function(id){
+    var found=(db.recs||[]).find(function(x){return x && String(x.id)===String(id);});
+    if(!found){toast('Makbuz kaydı bulunamadı');return;}
+    curR=JSON.parse(JSON.stringify(found));
+    isNewR=false;
+    openR();
+  };
+  window.newR=function(){
+    db.rn=(Number(db.rn)||0)+1;
+    curR={id:nextUnique(db.recs),no:'MKB-'+String(db.rn).padStart(4,'0'),
+      payer:'',amt:0,method:'Nakit',date:day(0),desc:'',qno:''};
+    isNewR=true;
+    openR();
+  };
+  window.rList=function(){
+    var rows=(db.recs||[]).slice().reverse();
+    $('rl').innerHTML=rows.length?rows.map(function(x){
+      return '<div class="card li" onclick="openRec('+JSON.stringify(x.id)+')"><div><b>'+
+        h(x.payer||'İsimsiz')+'</b><small>'+h(x.no||'')+' · '+dt(x.date)+' · '+
+        h(x.method||'')+'</small></div><b>'+fmt(x.amt)+'</b></div>';
+    }).join(''):'<div class="empty">Henüz makbuz yok.<br>"Yeni makbuz" ile tahsilat makbuzu kes.</div>';
+  };
+
+  // Resolve sales receipts from the exact transaction row; never select by a
+  // possibly duplicated legacy ID or the currently-open editor.
+  window.saleReceiptByIndex=function(index){
+    var source=F.tx[Number(index)];
+    if(!source || ['satis','satis_nakit'].indexOf(source.type)<0){
+      toast('Bu satır bir satış fişi değil');return;
+    }
+    var snapshot=JSON.parse(JSON.stringify(source));
+    try{
+      cv=drawSale(snapshot);
+      fnm='Satis-fisi-'+snapshot.id;
+      showCv(saleText(snapshot));
+    }catch(e){toast('Fiş hazırlanamadı: '+(e.message||e));}
+  };
+  window.saleReceipt=function(id){
+    var source=(F.tx||[]).find(function(x){
+      return x && String(x.id)===String(id) &&
+        ['satis','satis_nakit'].indexOf(x.type)>=0;
+    });
+    if(!source){toast('Satış kaydı bulunamadı');return;}
+    var snapshot=JSON.parse(JSON.stringify(source));
+    try{
+      cv=drawSale(snapshot);
+      fnm='Satis-fisi-'+snapshot.id;
+      showCv(saleText(snapshot));
+    }catch(e){toast('Fiş hazırlanamadı: '+(e.message||e));}
+  };
+
+  // Persist only if a duplicate was repaired. Existing non-duplicate records
+  // and all current localStorage data remain untouched.
+  if(txDuplicates.length) console.info('Cihan Metal Pro: duplicate transaction IDs repaired:',txDuplicates.length);
+  save();
+  if(typeof rList==='function') rList();
+})();
+</script>
+
 </body>
 </html>
