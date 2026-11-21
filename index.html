@@ -130,7 +130,7 @@ h3{font-size:15px;font-weight:800;letter-spacing:.1px}.hint{font-size:12px;line-
 <div id="fsd" class="ov"><div class="bar"><button class="b2" style="color:#fff;border-color:#fff4" onclick="$('fsd').style.display='none';finRender()">← Geri</button></div><div class="pg" id="fsb"></div></div>
 <div id="fo" class="ov"><div class="bar"><button class="b2" style="color:#fff;border-color:#fff4" onclick="$('fo').style.display='none'">← Geri</button><button class="bg" onclick="fSave()">Kaydet</button></div><div class="pg"><div class="card"><div id="fch" style="display:flex;flex-wrap:wrap;gap:6px"></div>
 <label>Tarih</label><input id="fd" type="date"><div id="wa1"><label id="fal">Hesap</label><select id="fa"></select></div><div id="wa2"><label>Hedef hesap</label><select id="fa2"></select></div><div id="wc"><label>Cari</label><select id="fc"></select></div>
-<div id="wit"><label>Ürünler (isteğe bağlı)</label><input id="fis" placeholder="Ürün ara…" oninput="fisl()" autocomplete="off"><div id="fisr"></div><div id="fil"></div><div class="row"><div><label>KDV</label><select id="fkm" onchange="fitT()"><option value="y">Yok</option><option value="h">Hariç</option><option value="d">Dahil</option></select></div><div><label>KDV %</label><input id="fkr" type="text" inputmode="decimal" oninput="fitT()"></div></div><div id="fitt" style="text-align:right;font-weight:700;margin-top:6px"></div><small style="display:block;color:var(--mut);margin-top:4px">Hesaplanan toplamı istersen elden aldığın/verdiğin gerçek tutarla değiştirebilirsin. Kaydedilen tutar bu alandaki değerdir.</small></div><div id="wvd"><label>Vade tarihi (opsiyonel)</label><input id="fvd" type="date"></div><div id="wk"><label>Kategori</label><select id="fk"></select></div><label>Tutar (TL)</label><input id="fam" type="text" inputmode="decimal" placeholder="0,00"><label>Not</label><input id="fno2" placeholder="Opsiyonel"><label>Fotoğraf (fiş, irsaliye…)</label><input id="fph" type="file" accept="image/*" capture="environment" onchange="fPh(this)" style="display:none"><input id="fph2" type="file" accept="image/*" onchange="fPh(this)" style="display:none"><div class="row"><button class="b2" onclick="$('fph').click()">📷 Kamera</button><button class="b2" onclick="$('fph2').click()">🖼 Galeri</button><button class="br" onclick="fPhX()">Kaldır</button></div><img id="fpi" style="display:none;width:100%;border-radius:8px;margin-top:6px"></div><div class="card"><button class="b2 full" id="fcp" onclick="fCopy()" style="margin-bottom:8px">Kopyala (yeni işlem)</button><button class="br full" id="fdel" onclick="fTxDel()">İşlemi sil</button></div></div></div>
+<div id="wit"><label>Ürünler (isteğe bağlı)</label><input id="fis" placeholder="Ürün ara…" oninput="fisl()" autocomplete="off"><div id="fisr"></div><div id="fil"></div><div class="row"><div><label>KDV</label><select id="fkm" onchange="fitT()"><option value="y">Yok</option><option value="h">Hariç</option><option value="d">Dahil</option></select></div><div><label>KDV %</label><input id="fkr" type="text" inputmode="decimal" oninput="fitT()"></div></div><div id="fitt" style="text-align:right;font-weight:700;margin-top:6px"></div></div><div id="wvd"><label>Vade tarihi (opsiyonel)</label><input id="fvd" type="date"></div><div id="wk"><label>Kategori</label><select id="fk"></select></div><label>Tutar (TL)</label><input id="fam" type="text" inputmode="decimal" placeholder="0,00"><label>Not</label><input id="fno2" placeholder="Opsiyonel"><label>Fotoğraf (fiş, irsaliye…)</label><input id="fph" type="file" accept="image/*" capture="environment" onchange="fPh(this)" style="display:none"><input id="fph2" type="file" accept="image/*" onchange="fPh(this)" style="display:none"><div class="row"><button class="b2" onclick="$('fph').click()">📷 Kamera</button><button class="b2" onclick="$('fph2').click()">🖼 Galeri</button><button class="br" onclick="fPhX()">Kaldır</button></div><img id="fpi" style="display:none;width:100%;border-radius:8px;margin-top:6px"></div><div class="card"><button class="b2 full" id="fcp" onclick="fCopy()" style="margin-bottom:8px">Kopyala (yeni işlem)</button><button class="br full" id="fdel" onclick="fTxDel()">İşlemi sil</button></div></div></div>
 <div id="fed" class="ov"><div class="bar"><button class="b2" style="color:#fff;border-color:#fff4" onclick="$('fed').style.display='none'">← Geri</button><button class="bg" onclick="fEdS()">Kaydet</button></div><div class="pg"><div class="card"><label>Ad</label><input id="fen"><label>Tür</label><select id="fet"></select><div id="feow"><label>Açılış bakiyesi (TL)</label><input id="feo" type="text" inputmode="decimal"></div></div><div class="card"><button class="br full" onclick="fEdD()">Sil</button></div></div></div>
 <div id="fmo" class="ov"><div class="bar"><button class="b2" style="color:#fff;border-color:#fff4" onclick="$('fmo').style.display='none'">← Geri</button><button class="bg" onclick="fMeS()">Kaydet</button></div><div class="pg"><div class="card"><b id="fmt"></b><label>Tarih</label><input id="fmd" type="date"><label>Miktar</label><input id="fmq" type="text" inputmode="decimal"><label>Not</label><input id="fmn"></div><div class="card"><button class="br full" onclick="fMeD()">Hareketi sil</button></div></div></div>
 <div id="p-h" class="pg on cm-home">
@@ -468,7 +468,7 @@ iRender();
 </script>
 <script>
 if(!db.fin)db.fin={acc:[{id:1,n:"Kasa",t:"Nakit",o:0}],tx:[],car:[]};
-var F=db.fin,fm=new Date().toISOString().slice(0,7),fv="a",ft="gelir",TY={gelir:"Gelir",gider:"Gider",transfer:"Transfer",satis_nakit:"Satış (peşin)",satis:"Satış (veresiye)",tahsilat:"Tahsilat",alis:"Alış (eski kayıt)",odeme:"Ödeme"};
+var F=db.fin,fm=new Date().toISOString().slice(0,7),fv="a",ft="gelir",TY={gelir:"Gelir",gider:"Gider",transfer:"Transfer",satis_nakit:"Satış (peşin)",satis:"Satış (veresiye)",tahsilat:"Tahsilat",alis:"Alış",odeme:"Ödeme"};
 function fnum(v){v=String(v).trim();if(v.indexOf(",")>=0)v=v.replace(/\./g,"").replace(",",".");return parseFloat(v)||0}
 function accBal(a){var b=a.o||0;F.tx.forEach(function(x){if(x.type=="transfer"){if(x.acc==a.id)b-=x.a;if(x.acc2==a.id)b+=x.a}else if(x.acc==a.id)b+=(x.type=="gelir"||x.type=="tahsilat"||x.type=="satis_nakit")?x.a:-x.a});return b}
 function carBal(c){var b=0;F.tx.forEach(function(x){if(x.car==c.id)b+=(x.type=="satis"||x.type=="odeme")?x.a:(x.type=="tahsilat"||x.type=="alis")?-x.a:0});return b}
@@ -537,7 +537,7 @@ function fPhSave(id){if(fpd)PH[id]=fpd;else delete PH[id];fPhW()}
 function fPhW(){var ok={};F.tx.forEach(function(x){ok[x.id]=1});for(var k in PH)if(!ok[k]&&k!=fe_id())delete PH[k];try{localStorage.setItem("tpph",JSON.stringify(PH))}catch(e){toast("Fotoğraf kaydedilemedi, depolama dolu")}}
 function fe_id(){return fe?fe.id:0}
 function fShow(){var i=$("fpi");i.style.display=fpd?"block":"none";if(fpd)i.src=fpd}
-function fPh(inp){var f=inp.files[0];if(!f)return;inp.value="";var im=new Image();im.onload=function(){var m=900,r=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=im.width*r;c.height=im.height*r;c.getContext("2d").drawImage(im,0,0,c.width,c.height);fpd=c.toDataURL("image/jpeg",0.65);fShow();URL.revokeObjectURL(im.src)};im.onerror=function(){toast("Fotoğraf açılamadı")};im.src=URL.createObjectURL(f)}
+function fPh(inp){var f=inp.files[0];if(!f)return;inp.value="";var im=new Image();im.onload=function(){var m=800,r=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=im.width*r;c.height=im.height*r;c.getContext("2d").drawImage(im,0,0,c.width,c.height);fpd=c.toDataURL("image/jpeg",0.6);fShow();URL.revokeObjectURL(im.src)};im.onerror=function(){toast("Fotoğraf açılamadı")};im.src=URL.createObjectURL(f)}
 function fPhX(){fpd=null;$("fph").value="";fShow()}
 var fOpen0=fOpen;fOpen=function(id,cid){fOpen0(id,cid);fpd=fe&&PH[fe.id]||null;$("fph").value="";fShow()};
 function stk(n){var q=0;F.sm.forEach(function(m){if(m.n==n)q+=m.q});return q}
@@ -584,8 +584,8 @@ function fitR(){fit=fit.filter(function(i){return i.q>0});$("fil").innerHTML=fit
 function fTot(){var s=0;fit.forEach(function(i){s+=i.q*i.p});return $("fkm").value=="h"?s*(1+fnum($("fkr").value)/100):s}
 function fitT(){fitSync();var t=fit.length?fTot():0;$("fitt").textContent=fit.length?"Toplam: "+fmt(t):"";if(fit.length)$("fam").value=String(Math.round(t*100)/100).replace(".",",")}
 var fCh1=fChips;fChips=function(){fCh1();$("wit").style.display="gelir satis alis".indexOf(ft)>=0?"block":"none";$("wvd").style.display=(ft=="satis"||ft=="alis")?"block":"none";$("fdel").style.display=$("fcp").style.display=fe?"block":"none"};
-var fOpen2=fOpen;fOpen=function(id,cid){fOpen2(id,cid);fit=fe&&fe.it?JSON.parse(JSON.stringify(fe.it)):[];$("fkm").value=fe&&fe.km||(db.set.kdv?"h":"y");$("fkr").value=String(fe&&fe.kr!=null?fe.kr:db.set.kdv||0).replace(".",",");$("fvd").value=fe&&fe.vd||"";$("fis").value="";$("fisr").innerHTML="";fitR();if(fe&&fe.it){fitT();$("fam").value=String(fe.a).replace(".",",");}fChips()};
-fSave=function(){fitSync();var it=fit.filter(function(i){return i.q>0}),a=fnum($("fam").value);// Kullanıcının elle düzelttiği tahsilat/ödeme tutarı korunur; otomatik toplam üzerine yazılmaz.if(a<=0){toast("Tutar gir");return}
+var fOpen2=fOpen;fOpen=function(id,cid){fOpen2(id,cid);fit=fe&&fe.it?JSON.parse(JSON.stringify(fe.it)):[];$("fkm").value=fe&&fe.km||(db.set.kdv?"h":"y");$("fkr").value=String(fe&&fe.kr!=null?fe.kr:db.set.kdv||0).replace(".",",");$("fvd").value=fe&&fe.vd||"";$("fis").value="";$("fisr").innerHTML="";fitR();if(fe&&fe.it)fitT();fChips()};
+fSave=function(){fitSync();var it=fit.filter(function(i){return i.q>0}),a=fnum($("fam").value);if(it.length&&"gelir satis alis".indexOf(ft)>=0)a=fTot();if(a<=0){toast("Tutar gir");return}
 var x={id:fe?fe.id:nextTxId(),d:$("fd").value||day(0),type:ft,a:Math.round(a*100)/100,no:$("fno2").value.trim()};
 if(ft=="gelir"||ft=="gider")x.k=$("fk").value=="__n"?"":$("fk").value;
 if(it.length&&"gelir satis alis".indexOf(ft)>=0){x.it=it;x.km=$("fkm").value;x.kr=fnum($("fkr").value)}
@@ -712,16 +712,16 @@ function v7DeleteCS(id){if(!confirm("Bu kayıt silinsin mi?"))return;db.v7.cs=db
     else if(x.type==='gider')b+=x.a;
   });return b;};
 
-  TY={gelir:'Gelir',gider:'Gider',transfer:'Transfer',satis:'Satış',satis_nakit:'Satış (eski kayıt)',tahsilat:'Tahsilat',odeme:'Ödeme',iade:'İade',alis:'Alış (eski kayıt)'};
+  TY={gelir:'Gelir',gider:'Gider',transfer:'Transfer',satis:'Satış',satis_nakit:'Satış (eski kayıt)',tahsilat:'Tahsilat',odeme:'Ödeme',iade:'İade',alis:'Alış'};
   fChips=function(){
-    var keys=['satis','gelir','gider','transfer','odeme','tahsilat','iade'];
+    var keys=['satis','alis','gelir','gider','transfer','odeme','tahsilat','iade'];
     $('fch').innerHTML=keys.map(function(k){return '<button class="'+(k===ft?'bg':'b2')+'" style="padding:8px 10px" onclick="ft=\''+k+'\';fChips()">'+TY[k]+'</button>';}).join('');
     $('wa1').style.display=(ft==='transfer'||ft==='gelir'||ft==='gider'||ft==='satis'||ft==='odeme'||ft==='tahsilat'||ft==='iade')?'block':'none';
     $('wa2').style.display=ft==='transfer'?'block':'none';
-    $('wc').style.display=(ft==='satis'||ft==='odeme'||ft==='tahsilat'||ft==='iade'||(fContextCar&&['gelir','gider'].indexOf(ft)>=0))?'block':'none';
+    $('wc').style.display=(ft==='satis'||ft==='alis'||ft==='odeme'||ft==='tahsilat'||ft==='iade'||(fContextCar&&['gelir','gider'].indexOf(ft)>=0))?'block':'none';
     $('wk').style.display=(ft==='gelir'||ft==='gider')?'block':'none';
     $('wrefund').style.display=ft==='iade'?'block':'none';
-    $('wit').style.display=(ft==='satis'||ft==='gelir')?'block':'none';
+    $('wit').style.display=(ft==='satis'||ft==='alis'||ft==='gelir')?'block':'none';
     $('wvd').style.display='none';
     $('fal').textContent=ft==='transfer'?'Kaynak hesap':'Hesap';
     $('fdel').style.display=$('fcp').style.display=fe?'block':'none';
@@ -828,7 +828,7 @@ function v7DeleteCS(id){if(!confirm("Bu kayıt silinsin mi?"))return;db.v7.cs=db
     cards.forEach(function(card){var small=card.querySelector('small');if(small)small.textContent='Müşteri + Tedarikçi · '+small.textContent.split(' · ').slice(-1)[0];});
     var row=$('fbody').querySelector('.row');if(row)row.innerHTML='<button class="b2" onclick="fAdd(\'car\',\'B\')">+ Yeni cari (müşteri / tedarikçi)</button>';
   }};
-  drawSale=function(tx){var c=F.car.filter(function(z){return z.id==tx.car})[0],a=F.acc.filter(function(z){return z.id==tx.acc})[0],cv=document.createElement('canvas');cv.width=1100;cv.height=Math.max(850,620+((tx.items||[]).length)*46);var x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.fillStyle='#15263b';x.fillRect(0,0,1100,170);x.fillStyle='#fff';x.font='bold 42px Arial';x.fillText(db.set.firma||'CİHAN METAL',55,75);x.font='bold 30px Arial';x.fillText('SATIŞ FİŞİ',55,125);x.fillStyle='#172033';x.font='bold 24px Arial';x.fillText('İşlem no: '+tx.id,60,230);var rows=[['Tarih',dt(tx.d)],['Müşteri',tx.type==='satis_nakit'?'Peşin satış':(c?c.n:(tx.customer||'Doğrudan satış'))],['Kayıt yeri',a?'Hesap: '+a.n:(tx.type==='satis_nakit'?'Kasa':'Cari hesap')],['Teklif no',tx.no||'-']];var y=290;rows.forEach(function(r){x.fillStyle='#657184';x.font='20px Arial';x.fillText(r[0],65,y);x.fillStyle='#172033';x.font='bold 22px Arial';x.fillText(r[1],340,y);y+=48;});if(tx.items&&tx.items.length){y+=12;x.fillStyle='#e9edf3';x.fillRect(50,y-25,1000,42);x.fillStyle='#15263b';x.font='bold 18px Arial';x.fillText('Ürün',65,y);x.fillText('Miktar',700,y);x.fillText('Tutar',930,y);y+=48;tx.items.forEach(function(it){x.fillStyle='#172033';x.font='18px Arial';x.fillText(String(it.n).slice(0,48),65,y);x.fillText(String(it.q)+' '+(it.u||''),700,y);x.textAlign='right';x.fillText(fmt(it.q*it.p),1015,y);x.textAlign='left';y+=42;});}y+=25;x.fillStyle='#eaf4ef';x.fillRect(50,y,1000,100);x.fillStyle='#16734d';x.font='bold 27px Arial';x.fillText('TOPLAM',80,y+62);x.font='bold 36px Arial';x.textAlign='right';x.fillText(fmt(tx.a)+' TL',1015,y+62);x.textAlign='left';x.fillStyle='#657184';x.font='18px Arial';x.fillText(db.set.firma+' · '+db.set.tel,60,y+145);return cv;};
+  drawSale=function(tx){var c=F.car.filter(function(z){return z.id==tx.car})[0],a=F.acc.filter(function(z){return z.id==tx.acc})[0],cv=document.createElement('canvas');cv.width=1100;cv.height=Math.max(850,620+((tx.items||[]).length)*46)+(Number(tx.discountAmount)>0?120:0);var x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.fillStyle='#15263b';x.fillRect(0,0,1100,170);x.fillStyle='#fff';x.font='bold 42px Arial';x.fillText(db.set.firma||'CİHAN METAL',55,75);x.font='bold 30px Arial';x.fillText('SATIŞ FİŞİ',55,125);x.fillStyle='#172033';x.font='bold 24px Arial';x.fillText('İşlem no: '+tx.id,60,230);var rows=[['Tarih',dt(tx.d)],['Müşteri',tx.type==='satis_nakit'?'Peşin satış':(c?c.n:(tx.customer||'Doğrudan satış'))],['Kayıt yeri',a?'Hesap: '+a.n:(tx.type==='satis_nakit'?'Kasa':'Cari hesap')],['Teklif no',tx.no||'-']];var y=290;rows.forEach(function(r){x.fillStyle='#657184';x.font='20px Arial';x.fillText(r[0],65,y);x.fillStyle='#172033';x.font='bold 22px Arial';x.fillText(r[1],340,y);y+=48;});if(tx.items&&tx.items.length){y+=12;x.fillStyle='#e9edf3';x.fillRect(50,y-25,1000,42);x.fillStyle='#15263b';x.font='bold 18px Arial';x.fillText('Ürün',65,y);x.fillText('Miktar',700,y);x.fillText('Tutar',930,y);y+=48;tx.items.forEach(function(it){x.fillStyle='#172033';x.font='18px Arial';x.fillText(String(it.n).slice(0,48),65,y);x.fillText(String(it.q)+' '+(it.u||''),700,y);x.textAlign='right';x.fillText(fmt(it.q*it.p),1015,y);x.textAlign='left';y+=42;});}y+=25;if(Number(tx.discountAmount)>0){x.fillStyle='#657184';x.font='20px Arial';x.fillText('Ara toplam',80,y+10);x.fillText('İskonto'+(tx.discountMode==='percent'?' (%'+String(tx.discountValue).replace('.',',')+')':''),80,y+55);x.fillStyle='#172033';x.font='bold 22px Arial';x.textAlign='right';x.fillText(fmt(tx.gross)+' TL',1015,y+10);x.fillStyle='#b3261e';x.fillText('-'+fmt(tx.discountAmount)+' TL',1015,y+55);x.textAlign='left';y+=95;}x.fillStyle='#eaf4ef';x.fillRect(50,y,1000,100);x.fillStyle='#16734d';x.font='bold 27px Arial';x.fillText('TOPLAM',80,y+62);x.font='bold 36px Arial';x.textAlign='right';x.fillText(fmt(tx.a)+' TL',1015,y+62);x.textAlign='left';x.fillStyle='#657184';x.font='18px Arial';x.fillText(db.set.firma+' · '+db.set.tel,60,y+145);return cv;};
 })();
 </script>
 
@@ -844,11 +844,11 @@ function v7DeleteCS(id){if(!confirm("Bu kayıt silinsin mi?"))return;db.v7.cs=db
     if(tx.type==='transfer')rows.push(['Hedef hesap',acc2?acc2.n:'-']);
     if(tx.k)rows.push(['Kategori / açıklama',tx.k]);if(tx.no)rows.push(['Not / belge no',tx.no]);
     if(tx.method)rows.push(['Ödeme yöntemi',tx.method]);
-    var cv=document.createElement('canvas');cv.width=1100;cv.height=Math.max(900,850+((tx.items||tx.it||[]).length)*48);var x=cv.getContext('2d');
+    var cv=document.createElement('canvas');cv.width=1100;cv.height=Math.max(900,850+((tx.items||tx.it||[]).length)*48)+(Number(tx.discountAmount)>0?120:0);var x=cv.getContext('2d');
     x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.fillStyle='#202a35';x.fillRect(0,0,1100,170);x.fillStyle='#fff';x.font='bold 42px Arial';x.fillText(db.set.firma||'CİHAN METAL',55,70);x.font='bold 29px Arial';x.fillText(title,55,125);
     var y=235;rows.forEach(function(r){x.fillStyle='#657184';x.font='20px Arial';x.fillText(r[0],65,y);x.fillStyle='#172033';x.font='bold 22px Arial';x.fillText(String(r[1]).slice(0,55),360,y);y+=49;});
     var items=tx.items||tx.it||[];if(items.length){y+=15;x.fillStyle='#e9edf3';x.fillRect(50,y-25,1000,44);x.fillStyle='#15263b';x.font='bold 18px Arial';x.fillText('Ürün / açıklama',65,y);x.fillText('Miktar',700,y);x.fillText('Tutar',930,y);y+=48;items.forEach(function(it){x.fillStyle='#172033';x.font='18px Arial';x.fillText(String(it.n||'').slice(0,48),65,y);x.fillText(String(it.q||1)+' '+(it.u||''),700,y);x.textAlign='right';x.fillText(fmt((Number(it.q)||1)*(Number(it.p)||0)),1015,y);x.textAlign='left';y+=42;});}
-    y+=25;x.fillStyle='#f0f3f6';x.fillRect(50,y,1000,100);x.fillStyle='#15263b';x.font='bold 26px Arial';x.fillText('İŞLEM TUTARI',80,y+60);x.font='bold 36px Arial';x.textAlign='right';x.fillText(fmt(tx.a)+' TL',1015,y+60);x.textAlign='left';
+    y+=25;if(Number(tx.discountAmount)>0){x.fillStyle='#657184';x.font='20px Arial';x.fillText('Ara toplam',80,y+10);x.fillText('İskonto'+(tx.discountMode==='percent'?' (%'+String(tx.discountValue).replace('.',',')+')':''),80,y+55);x.fillStyle='#172033';x.font='bold 22px Arial';x.textAlign='right';x.fillText(fmt(tx.gross)+' TL',1015,y+10);x.fillStyle='#b3261e';x.fillText('-'+fmt(tx.discountAmount)+' TL',1015,y+55);x.textAlign='left';y+=95;}x.fillStyle='#f0f3f6';x.fillRect(50,y,1000,100);x.fillStyle='#15263b';x.font='bold 26px Arial';x.fillText('İŞLEM TUTARI',80,y+60);x.font='bold 36px Arial';x.textAlign='right';x.fillText(fmt(tx.a)+' TL',1015,y+60);x.textAlign='left';
     x.fillStyle='#657184';x.font='18px Arial';x.fillText((db.set.firma||'CİHAN METAL')+' · '+(db.set.tel||''),60,y+145);
     window.cv=cv;fnm='Fis-'+tx.id;var text=[title+' - '+(db.set.firma||'CİHAN METAL')].concat(rows.map(function(r){return r[0]+': '+r[1]})).concat(['Tutar: '+fmt(tx.a)+' TL','Tel: '+(db.set.tel||'')]).join('\n');showCv(text);
   };
@@ -860,7 +860,7 @@ function v7DeleteCS(id){if(!confirm("Bu kayıt silinsin mi?"))return;db.v7.cs=db
   // Attach multiple photos/documents to each customer or supplier record.
   var carDocs={};try{carDocs=JSON.parse(localStorage.getItem('tp_car_docs')||'{}')||{};}catch(e){} window.__carDocsRef=function(){return carDocs};
   function saveCarDocs(){if(window.v8Put)window.v8Put('tp_car_docs',carDocs,'tp_car_docs');else{try{localStorage.setItem('tp_car_docs',JSON.stringify(carDocs));}catch(e){}}}
-  window.carDocAdd=function(input){var f=input.files&&input.files[0];input.value='';if(!f||!fcur)return;var im=new Image();im.onload=function(){var scale=Math.min(1,1400/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*scale);c.height=Math.round(im.height*scale);c.getContext('2d').drawImage(im,0,0,c.width,c.height);var data=c.toDataURL('image/jpeg',.72);(carDocs[fcur]||(carDocs[fcur]=[])).push({id:Date.now(),name:f.name||'Cari belgesi',date:day(0),data:data});saveCarDocs();fCd(fcur);toast('Cari belgesi eklendi');};im.onerror=function(){toast('Fotoğraf okunamadı');};im.src=URL.createObjectURL(f);};
+  window.carDocAdd=function(input){var f=input.files&&input.files[0];input.value='';if(!f||!fcur)return;var im=new Image();im.onload=function(){var scale=Math.min(1,1200/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*scale);c.height=Math.round(im.height*scale);c.getContext('2d').drawImage(im,0,0,c.width,c.height);var data=c.toDataURL('image/jpeg',.65);(carDocs[fcur]||(carDocs[fcur]=[])).push({id:Date.now(),name:f.name||'Cari belgesi',date:day(0),data:data});saveCarDocs();fCd(fcur);toast('Cari belgesi eklendi');};im.onerror=function(){toast('Fotoğraf okunamadı');};im.src=URL.createObjectURL(f);};
   window.carDocDelete=function(cid,did){if(!confirm('Bu belge silinsin mi?'))return;carDocs[cid]=(carDocs[cid]||[]).filter(function(z){return z.id!==did;});saveCarDocs();fCd(cid);};
   window.carDocOpen=function(cid,did){var d=(carDocs[cid]||[]).filter(function(z){return z.id===did})[0];if(!d)return;var w=window.open();if(w){w.document.write('<title>'+String(d.name).replace(/[<>]/g,'')+'</title><img style="max-width:100%" src="'+d.data+'">');}else{var a=document.createElement('a');a.href=d.data;a.download=d.name||'cari-belge.jpg';a.click();}};
   var prevFcdDocs=fCd;fCd=function(id){prevFcdDocs(id);var docs=carDocs[id]||[],html='<div class="card" style="margin-top:12px"><b>Cari fotoğraf ve belgeleri</b><div class="row" style="margin-top:8px"><button class="b2" onclick="document.getElementById(\'carDocCamera\').click()">📷 Kamera</button><button class="b2" onclick="document.getElementById(\'carDocGallery\').click()">🖼 Galeri</button></div><input id="carDocCamera" type="file" accept="image/*" capture="environment" style="display:none" onchange="carDocAdd(this)"><input id="carDocGallery" type="file" accept="image/*" style="display:none" onchange="carDocAdd(this)">';
@@ -1155,7 +1155,7 @@ function v7DeleteCS(id){if(!confirm("Bu kayıt silinsin mi?"))return;db.v7.cs=db
   }
   window.cmDriveManualBackup=function(){if(!driveToken){window.connectCihanDrive();return;}lastDriveUpload=0;driveUpload();};
   window.cmDriveListBackups=driveBackupList;
-  function addDriveBackupPanel(){var settings=document.getElementById('p-s');if(!settings||document.getElementById('cmDriveBackupPanel'))return;var card=document.createElement('div');card.className='card';card.id='cmDriveBackupPanel';card.style.marginTop='12px';card.innerHTML='<h3>Google Drive yedek geçmişi</h3><p class="hint">Fotoğraflar ve cari belgeler de yedeğe dahildir. Uygulamayı silip yeniden yükledikten sonra aynı Google hesabıyla bağlanıp yedeği listeleyerek geri yükle. Son yedek tarihini kontrol et, şimdi yeni yedek yükle veya eski telefonundaki yedeği seç. Geri yükleme mevcut kayıtları güvenli birleştirme kontrolünden geçirir.</p><div id="cmDriveLastInfo" class="hint"></div><div class="row"><button class="bg" onclick="cmDriveManualBackup()">Şimdi Drive’a yedekle</button><button class="b2" onclick="cmDriveListBackups()">Yedekleri listele</button></div><div id="cmDriveBackups"></div>';var anchor=document.getElementById('cmExportHub')||settings.lastElementChild;if(anchor&&anchor.parentNode===settings)anchor.insertAdjacentElement('afterend',card);else settings.appendChild(card);refreshDriveLastInfo();}
+  function addDriveBackupPanel(){var settings=document.getElementById('p-s');if(!settings||document.getElementById('cmDriveBackupPanel'))return;var card=document.createElement('div');card.className='card';card.id='cmDriveBackupPanel';card.style.marginTop='12px';card.innerHTML='<h3>Google Drive yedek geçmişi</h3><p class="hint">Son yedek tarihini kontrol et, şimdi yeni yedek yükle veya eski telefonundaki yedeği seçerek geri yükle. Geri yükleme mevcut kayıtları güvenli birleştirme kontrolünden geçirir.</p><div id="cmDriveLastInfo" class="hint"></div><div class="row"><button class="bg" onclick="cmDriveManualBackup()">Şimdi Drive’a yedekle</button><button class="b2" onclick="cmDriveListBackups()">Yedekleri listele</button></div><div id="cmDriveBackups"></div>';var anchor=document.getElementById('cmExportHub')||settings.lastElementChild;if(anchor&&anchor.parentNode===settings)anchor.insertAdjacentElement('afterend',card);else settings.appendChild(card);refreshDriveLastInfo();}
   function refreshDriveLastInfo(){var el=document.getElementById('cmDriveLastInfo');if(!el)return;var d=Number(db.lastDriveBk||0);el.textContent=d?'Bu cihazdan son Drive yüklemesi: '+new Date(d).toLocaleString('tr-TR'):'Bu cihaz için başarılı Drive yükleme tarihi henüz kaydedilmemiş.';}
   var priorDriveStatus=status;status=function(t){priorDriveStatus(t);refreshDriveLastInfo();};
   addDriveBackupPanel();if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addDriveBackupPanel);
@@ -1845,7 +1845,7 @@ style="position:fixed;left:14px;bottom:calc(78px + env(safe-area-inset-bottom,0p
     var hasLines=lines.length>0 && ['gelir','satis','alis'].indexOf(type)>=0;
     var gross=entered?num(entered):(hasLines&&typeof window.fTot==='function'?Number(window.fTot())||0:0);
     if(!(gross>0)){toast('Geçerli tutar gir');return;}
-    var disc=(typeof window.cmV90GetDiscount==='function'&&['gelir','gider','satis'].indexOf(type)>=0)?window.cmV90GetDiscount(gross):{mode:'none',value:0,amount:0,net:gross};
+    var disc=(typeof window.cmV90GetDiscount==='function'&&['gelir','gider','satis','satis_nakit','alis'].indexOf(type)>=0)?window.cmV90GetDiscount(gross):{mode:'none',value:0,amount:0,net:gross};
     if(disc.amount>gross||!(disc.net>0)){toast('İskonto sonrası tutar sıfır olamaz');return;}
     var net=r2(disc.net);
     // Product-line totals are adjusted to the saved net amount for every item transaction.
@@ -1870,9 +1870,10 @@ style="position:fixed;left:14px;bottom:calc(78px + env(safe-area-inset-bottom,0p
       x.acc=+$('fa').value;x.acc2=+$('fa2').value;
       if(!x.acc||!x.acc2||x.acc===x.acc2){toast('Kaynak ve hedef hesap farklı olmalı');return;}
     } else if(['gelir','gider','satis','odeme','tahsilat','iade'].indexOf(type)>=0){var av=+$('fa').value;if(av)x.acc=av;}
-    if(['satis','odeme','tahsilat','iade'].indexOf(type)>=0||(window.fContextCar&&['gelir','gider'].indexOf(type)>=0)){
+    if(['satis','alis','odeme','tahsilat','iade'].indexOf(type)>=0||(window.fContextCar&&['gelir','gider'].indexOf(type)>=0)){
       var cv=+$('fc').value;if(cv)x.car=cv;
     }
+    if(type==='alis'){var sup=F.car.filter(function(z){return z.id==x.car})[0];if(!sup||sup.t!=='T'){toast('Alış için tedarikçi cari seç');return;}}
     if(type==='satis'&&!x.acc&&!x.car){toast('Satış için hesap veya cari seç');return;}
     if(type==='satis'&&x.acc&&x.car){toast('Satışta ya hesap ya cari seç; ikisini birden seçme');return;}
     if((type==='odeme'||type==='tahsilat')&&(!x.acc||!x.car)){toast('Ödeme / tahsilat için hem hesap hem cari seç');return;}
@@ -1889,4 +1890,151 @@ style="position:fixed;left:14px;bottom:calc(78px + env(safe-area-inset-bottom,0p
   };
 })();
 
+</script>
+<script>
+/* Cihan Metal Pro V9.3: varsayılan iskonto ayarı, fişte iskonto, yedek boyutu uyarısı */
+(function(){
+  'use strict';
+  var $=window.$||function(id){return document.getElementById(id);};
+  var DTYPES=['gelir','gider','satis','satis_nakit','alis'];
+  function pnum(v){v=String(v==null?'':v).trim();if(v.indexOf(',')>=0)v=v.replace(/\./g,'').replace(',','.');return Math.max(0,Number(v)||0);}
+
+  /* 1) Ayarlar > İskonto bölümü */
+  function addSettingsCard(){
+    if($('cmV93Disc'))return;
+    var btn=document.querySelector('#p-s button.bg.full[onclick="saveSet()"]');if(!btn)return;
+    var c=document.createElement('div');c.className='card';c.id='cmV93Disc';
+    c.innerHTML='<h3>İskonto</h3><p class="hint">Gelir, gider ve satış işlemlerinde hazır gelir. İskonto KDV\'li toplamdan düşer. İşlemde tek tek değiştirebilirsin.</p>'+
+      '<div class="row"><div><label>Varsayılan tür</label><select id="cmV93Mode"><option value="none">İskonto yok</option><option value="percent">Yüzde (%)</option><option value="fixed">TL indirimi</option></select></div>'+
+      '<div><label>Miktar</label><input id="cmV93Val" type="text" inputmode="decimal" placeholder="0"></div></div>';
+    btn.parentNode.insertBefore(c,btn);
+    loadDisc();
+  }
+  function loadDisc(){if(!$('cmV93Mode'))return;var s=window.db&&db.set||{};$('cmV93Mode').value=s.discMode||'none';$('cmV93Val').value=s.discVal!=null&&s.discVal!==''?String(s.discVal).replace('.',','):'';}
+  if(typeof window.loadSet==='function'){var ls0=window.loadSet;window.loadSet=function(){var r=ls0.apply(this,arguments);addSettingsCard();loadDisc();return r;};}
+  if(typeof window.saveSet==='function'){
+    var ss0=window.saveSet;
+    window.saveSet=function(){
+      var old=db.set||{},mode=$('cmV93Mode')?$('cmV93Mode').value:(old.discMode||'none'),val=$('cmV93Val')?pnum($('cmV93Val').value):(old.discVal||0);
+      if(mode==='percent'&&val>100)val=100;
+      var keep=Object.assign({},old);
+      // saveSet eskiden db.set'i baştan kurar; iskonto ve diğer ek alanları koru
+      var origAlert=window.alert;window.alert=function(){};
+      try{ss0.apply(this,arguments);}finally{window.alert=origAlert;}
+      Object.keys(keep).forEach(function(k){if(!(k in db.set))db.set[k]=keep[k];});
+      db.set.discMode=mode;db.set.discVal=val;
+      save();origAlert.call(window,'Kaydedildi');
+    };
+  }
+  addSettingsCard();
+
+  /* 2) Yeni işlemde varsayılan iskonto */
+  var pending=false;
+  if(typeof window.fOpen==='function'){
+    var fo0=window.fOpen;
+    window.fOpen=function(id){pending=!id;var r=fo0.apply(this,arguments);try{applyDefault();}catch(e){}return r;};
+  }
+  function applyDefault(){
+    var card=$('cmV90Discount');
+    if(card)card.style.display=DTYPES.indexOf(window.ft)>=0?'block':'none';
+    if(!pending||DTYPES.indexOf(window.ft)<0)return;
+    var s=db.set||{},m=$('cmV90Mode'),v=$('cmV90Value');
+    if(!m||!v||!s.discMode||s.discMode==='none'||!(Number(s.discVal)>0))return;
+    if(m.value!=='none')return;
+    m.value=s.discMode;v.value=String(s.discVal).replace('.',',');
+    m.dispatchEvent(new Event('change'));v.dispatchEvent(new Event('input'));
+    pending=false;
+  }
+  if(typeof window.fChips==='function'){var fc0=window.fChips;window.fChips=function(){var r=fc0.apply(this,arguments);try{applyDefault();}catch(e){}return r;};}
+
+  /* 3) Yedek boyutu bilgisi ve uyarısı */
+  var LIMIT_MB=50;
+  function strLen(x){if(typeof x==='string')return x.length;if(x&&typeof x==='object'){if(typeof x.data==='string')return x.data.length;var n=0;Object.keys(x).forEach(function(k){n+=strLen(x[k]);});return n;}return 0;}
+  function backupStats(){
+    var ph=window.PH||{},cd=(window.__carDocsRef?window.__carDocsRef():{})||{},n=0,bytes=0;
+    Object.keys(ph).forEach(function(k){n++;bytes+=strLen(ph[k]);});
+    Object.keys(cd).forEach(function(k){var a=cd[k];if(Array.isArray(a))a.forEach(function(d){n++;bytes+=strLen(d);});});
+    var base=0;try{base=JSON.stringify(window.db).length;}catch(e){}
+    return {count:n,mb:(bytes+base)/1048576};
+  }
+  function fmtMb(m){return m<1?'1 MB\'tan küçük':(Math.round(m*10)/10).toLocaleString('tr-TR')+' MB';}
+  if(typeof window.bkInfo==='function'){
+    var bi0=window.bkInfo;
+    window.bkInfo=function(){bi0.apply(this,arguments);var e=$('bkinfo');if(!e)return;var st=backupStats();e.textContent+=' · '+st.count+' fotoğraf · Yedek boyutu yaklaşık '+fmtMb(st.mb)+(st.mb>LIMIT_MB?' — büyük! Eski fotoğrafları temizlemeyi düşün.':'');};
+    try{window.bkInfo();}catch(e){}
+  }
+  function warnBig(){var st=backupStats();if(st.mb>LIMIT_MB)toast('Yedek büyük (yaklaşık '+fmtMb(st.mb)+'). Hazırlanması uzun sürebilir; uygulamayı kapatma.');}
+  ['backup','shareBackup'].forEach(function(nm){
+    if(typeof window[nm]!=='function')return;var f0=window[nm];
+    window[nm]=function(){try{warnBig();}catch(e){}return f0.apply(this,arguments);};
+  });
+  if(typeof window.restore==='function'){
+    var rs0=window.restore;
+    window.restore=function(input){
+      try{var f=input&&input.files&&input.files[0];if(f&&f.size>5*1048576)toast('Yedek dosyası okunuyor ('+fmtMb(f.size/1048576)+'). Lütfen bekle, uygulamayı kapatma.');}catch(e){}
+      return rs0.apply(this,arguments);
+    };
+  }
+})();
+</script>
+<script>
+/* V9.3b: Elle yazılan toplamın ürünlere nasıl dağıtılacağını kayıttan ÖNCE göster */
+(function(){
+  'use strict';
+  var $=window.$||function(id){return document.getElementById(id);};
+  function pnum(v){v=String(v==null?'':v).trim().replace(/\s/g,'');if(v.indexOf(',')>=0)v=v.replace(/\./g,'').replace(',','.');return Number(v)||0;}
+  function money(v){return (Math.round(v*100)/100).toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function box(){
+    var b=$('cmV93Dist');if(b)return b;
+    var anchor=$('cmV90Preview')||$('fam');if(!anchor)return null;
+    b=document.createElement('div');b.id='cmV93Dist';
+    b.style.cssText='display:none;margin-top:8px;padding:10px;border-radius:10px;background:#eef6ff;color:#15263b;font-size:13px;line-height:1.5';
+    var host=anchor.parentNode;host.insertBefore(b,anchor.nextSibling);return b;
+  }
+  function update(){
+    var b=box();if(!b)return;
+    var type=window.ft,ok=['gelir','satis','alis'].indexOf(type)>=0;
+    var fo=$('fo');if(!fo||fo.style.display==='none'||!ok){b.style.display='none';return;}
+    try{if(typeof window.fitSync==='function')window.fitSync();}catch(e){}
+    var lines=(Array.isArray(window.fit)?window.fit:[]).filter(function(z){return Number(z.q)>0&&Number(z.p)>=0&&z.n;});
+    if(!lines.length){b.style.display='none';return;}
+    var sub=Number(window.fTot())||0,entered=String($('fam')?$('fam').value:'').trim();
+    if(!(sub>0)){b.style.display='none';return;}
+    if(!entered){b.style.display='block';b.innerHTML='Tutar boş: ürün toplamı <b>'+money(sub)+' TL</b> kullanılır, fiyatlar değişmez.';return;}
+    var gross=pnum(entered),net=gross;
+    try{if(typeof window.cmV90GetDiscount==='function'){var d=window.cmV90GetDiscount(gross);if(d&&d.net>0)net=d.net;}}catch(e){}
+    var diff=net-sub;
+    if(Math.abs(diff)<0.005){b.style.display='block';b.innerHTML='Ürün toplamı ile yazdığın tutar aynı, fiyatlar değişmez.';return;}
+    var f=net/sub,vatMode=$('fkm')?$('fkm').value:'y',rows=lines.slice(0,6).map(function(z){
+      return '<div style="display:flex;justify-content:space-between;gap:8px"><span>'+String(z.n).replace(/</g,'&lt;')+' ('+z.q+')</span><span>'+money(z.p)+' → <b>'+money(z.p*f)+'</b></span></div>';}).join('');
+    b.style.display='block';
+    b.innerHTML='Kayıtta ürünlerin birim fiyatı şöyle olacak (fark orantılı dağıtılır):'+
+      '<div style="margin-top:6px">'+rows+(lines.length>6?'<div>… +'+(lines.length-6)+' kalem</div>':'')+'</div>'+
+      (vatMode==='h'?'<div style="margin-top:4px;color:#657184">KDV hariç fiyat gösterilir.</div>':'');
+  }
+  setInterval(function(){try{update();}catch(e){}},400);
+  document.addEventListener('input',function(e){if(e.target&&(e.target.id==='fam'||e.target.id==='cmV90Value'||(e.target.classList&&e.target.classList.contains('fiq'))))setTimeout(update,0);},true);
+})();
+</script>
+<script>
+/* V9.4: Alış işlemi — ürün kalemleriyle tedarikçi carisine borç yazar, kasaya dokunmaz */
+(function(){
+  'use strict';
+  var $=window.$||function(id){return document.getElementById(id);};
+  function opts(list){return list.map(function(c){return '<option value="'+c.id+'">'+String(c.n).replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</option>';}).join('');}
+  function syncCari(){
+    var sel=$('fc');if(!sel||!window.F)return;
+    var list=window.ft==='alis'?F.car.filter(function(c){return c.t==='T';}):F.car;
+    var keep=sel.value;sel.innerHTML=opts(list);
+    if(list.some(function(c){return String(c.id)===String(keep);}))sel.value=keep;
+    var fl=$('fcl');
+    var hint=$('cmV94Hint');
+    if(!hint){hint=document.createElement('div');hint.id='cmV94Hint';hint.style.cssText='font-size:12px;color:#657184;margin:4px 0 8px';var wc=$('wc');if(wc)wc.appendChild(hint);}
+    if(window.ft==='alis'){
+      hint.style.display='block';
+      hint.textContent=list.length?'Alış tedarikçi carisine borç yazılır, kasaya dokunmaz. Ödemeyi sonra "Ödeme" olarak girersin.':'Önce Cariler bölümünden bir tedarikçi ekle.';
+    }else hint.style.display='none';
+  }
+  if(typeof window.fChips==='function'){var fc0=window.fChips;window.fChips=function(){var r=fc0.apply(this,arguments);try{syncCari();}catch(e){}return r;};}
+})();
 </script>
